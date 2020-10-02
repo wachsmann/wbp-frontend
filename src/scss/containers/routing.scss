@@ -1,0 +1,406 @@
+
+/*
+*
+* Map Places
+*
+*/
+.pac-container{
+  z-index:2000;
+}
+/**
+* Loaders
+*/
+.routing_loader{
+    height: 100%;
+    overflow: auto;
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    background-color: #00000036;
+    div{
+        top: 50%;
+        position: absolute;
+        left: 50%;
+    }
+}
+
+/**
+TOGGLES
+*/
+#toggle-box{
+    width: min-content;
+    background-color: rgb(255, 255, 255);
+    border: 2px solid rgb(255, 255, 255);
+    border-radius: 3px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 6px;
+    cursor: pointer;
+    margin-bottom: 0px;
+    text-align: center;
+    padding: 8px;
+    margin: 10px;
+}
+.toggle-btn{
+    display: inline-grid;
+    -webkit-justify-content: flex-start;
+    justify-content: end;
+    
+}
+.toggle-btn__display-label{
+    font-size: 10px;
+}
+
+/**
+TOPBAR
+*/
+.topbar__search-field{
+  z-index: 0;
+    position: absolute;
+    border-radius: 0%!important;
+    height: 40px!important;
+    min-width: 300px!important;
+    background-color: white!important;
+    margin: 10px 0px 0px 0px!important;
+
+    box-shadow: rgba(0, 0, 0, 0.15) 1px 2px 4px;
+}
+#search-box{
+  
+
+  margin:10px;
+  background-color: white;
+  box-shadow: 1px 2px 4px #00000026;
+  .search-input{
+    height: 31px;
+  }
+  .top_actions_routes{
+    z-index: 0;
+    position: absolute;
+    top: 0px;
+    left: 595px;
+    margin: 10px;
+  }
+  .radio-btn__label {
+      vertical-align: text-bottom;
+      display:block;
+  }
+  
+  .btn.icon{
+    border-radius: 0px;
+    margin:0px;
+    padding: 11px 14px;
+  }
+  .input-form{
+    background-color: white;
+  }
+  .dropdown__menu{
+    min-width: 3.4rem!important;
+  }
+  .dropdown-item{
+    text-align: center!important;
+    padding: 0!important;
+    margin: 0!important;
+  }
+
+}
+.topbar__back {
+ 
+  width: 0!important;
+ 
+}
+.topbar__search {
+  display: none;
+  margin: auto 0;
+  padding: 0;
+  position: relative;
+}
+
+.topbar__search-field {
+  width: 0;
+  transition: all 0.3s;
+  opacity: 0;
+  margin: auto auto auto 0;
+  border: none;
+  border-radius: 13px;
+  height: 26px;
+  padding-left: 10px;
+  padding-right: 46px;
+
+  @include themify($themes) {
+    background-color: themed('colorBackgroundBody');
+  }
+
+  &.topbar__search-field--open {
+    width: 200px;
+    opacity: 1;
+    margin-left: 10px;
+
+    & + button {
+      right: 10px;
+    }
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.topbar__search-btn {
+  background-color: white;
+  width: 30px;
+
+  &:hover {
+
+    @include themify($themes) {
+      background-color: themed('colorBackgroundBody');
+    }
+  }
+}
+
+@media screen and (min-width: 480px) {
+
+  .topbar__avatar-name {
+    display: block;
+  }
+
+  .topbar__menu {
+    width: 100%;
+    left: 0 !important;
+  }
+}
+
+@media screen and (min-width: 576px) {
+
+  .topbar__button {
+
+    &.topbar__button--desktop {
+      display: block;
+    }
+
+    &.topbar__button--mobile {
+      display: none;
+    }
+  }
+
+  .topbar.topbar--navigation {
+
+    .topbar__button.topbar__button--mobile {
+      display: block;
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+
+  .topbar__search {
+    display: flex;
+  }
+}
+/**
+IMPORTATION BUTTON
+*/
+.imports-button{
+  margin-right: 10px;
+    button{
+        background-color: white;
+        margin: 10px;
+        padding: 11px 11px 11px 11px;
+        background: none rgb(255, 255, 255);
+        border: 0px;
+        margin: 10px;
+        padding: 0px;
+       
+        cursor: pointer;
+        user-select: none;
+        border-radius: 2px;
+        height: 40px;
+        width: 40px;
+        box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+        overflow: hidden;
+       
+        outline: none;
+    
+    }
+    
+}
+/*
+* 
+* Route Card
+* 
+*
+*/
+.route-name{
+    margin-bottom: 20px;
+    float: left;
+    width: 210px;
+    margin: 0;
+    height: 27px;
+    border-top:0px;
+    border-right:0px;
+    border-left:0px;
+    border-bottom: 1px solid #000000;
+    &:focus {
+      outline: none;
+  }
+}
+.route {
+  position: fixed;
+  top: 0;
+  @include directify($directions) {
+    #{directed('right')}: 0px;
+  }
+  z-index: 102;
+
+  .route__toggle {
+
+    span {
+      @include directify($directions) {
+        #{directed('margin-right')}: 10px;
+        #{directed('margin-left')}: 0px;
+      }
+
+      @include themify($themes) {
+        color: themed('colorText');
+      }
+    }
+  }
+}
+
+.route__btn {
+  width: 50px;
+  height: 50px;
+  position: fixed;
+  bottom: 80px;
+  @include directify($directions) {
+    #{directed('right')}: 0px;
+  }
+  border: none;
+  border-radius: 3px 0 0 3px;
+  box-shadow: 0 1px 30px 1px rgba(0, 0, 0, 0.11);
+  cursor: pointer;
+  z-index: 102;
+
+  @include themify($themes) {
+    background-color: themed('colorBackground');
+  }
+}
+
+.route__btn-icon {
+  width: 18px;
+  height: 18px;
+  animation: iconOpacity linear infinite 4s;
+}
+
+@keyframes iconOpacity {
+  from {
+    opacity: 1
+  }
+  50% {
+    opacity: 0.3
+  }
+  to {
+    opacity: 1
+  }
+}
+
+.route__wrap {
+  height: 101vh;
+  width: 240px;
+  box-shadow: none;
+  padding: 15px 5px 0px 15px;
+  transform: translateX(100%);
+  transition: transform 0.3s;
+  position: fixed;
+  top: 0;
+  @include directify($directions) {
+    #{directed('right')}: 0px;
+  }
+  z-index: 102;
+
+  @include themify($themes) {
+    background-color: themed('colorBackground');
+  }
+
+  &.route__wrap--open {
+    transform: translateX(0);
+    box-shadow: 0 1px 30px 1px rgba(0, 0, 0, 0.11);
+  }
+}
+
+.route__title-wrap {
+  padding:10px 10px 10px 10px;
+  position: relative;
+  @include directify($directions) {
+    text-align: directed('left');
+  }
+
+  @include themify($themes) {
+    border-bottom: 1px solid themed('colorBorder');
+  }
+}
+
+.route__caption {
+  color: $color-additional;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  @include directify($directions) {
+    text-align: directed('left');
+  }
+}
+
+.route__close-btn {
+  position: absolute;
+  @include directify($directions) {
+    #{directed('right')}: 0px;
+  }
+  top: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  svg {
+    fill: $color-additional;
+    width: 14px;
+    height: 14px;
+    transition: 0.3s;
+  }
+
+  &:hover {
+
+    svg {
+      fill: $color-accent;
+    }
+  }
+}
+
+.destination-row{
+    margin: 0px 0px 0px -15px;
+    padding: 10px 0px 5px 10px;
+    display: inline-flex;
+    h6{
+        line-height: 23px;
+    }
+}
+/*
+*
+* DnD 
+*
+*/
+.dnd-waypoints{
+    margin: 0px 0px 0px -15px;
+    max-height:400px;
+    overflow: auto;
+    .draggable-row{
+   
+        width: 100%;
+        height: fit-content;
+        .draggable-component{
+            padding: 5px 0px 5px 10px;
+            border: 0.8px solid #23232952;
+        }
+        .btn-delete{
+            float:right;
+            margin:0;
+        }
+    }
+}
