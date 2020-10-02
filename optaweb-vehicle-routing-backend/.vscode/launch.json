@@ -1,0 +1,16 @@
+{
+    "configurations": [
+
+        {
+            "type": "java",
+            "name": "W/B Planner<backend>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "org.optaweb.vehiclerouting.OptaWebVehicleRoutingApplication",
+            "projectName": "backend",
+            "args": ""
+        },
+        
+    ]
+}
