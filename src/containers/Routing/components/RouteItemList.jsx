@@ -31,8 +31,7 @@ export default function RouteItemList({route,removeRoute,handleItemClick}) {
   const classes = useStyles();
   const routeId = route.getId()
   const name = route.getName()
-  const distance = route.getDistance()
-  const estimatedTime = route.getEstimatedTime()
+
   const color = route.getColor()
   
   return (
@@ -45,11 +44,11 @@ export default function RouteItemList({route,removeRoute,handleItemClick}) {
             secondary={
                 <React.Fragment>
                 <Typography variant="caption" display="block" gutterBottom>
-                    Distância: {distance} km
+                    
                 </Typography>
                
                 <Typography variant="caption" display="block" gutterBottom>
-                    Tempo estimado: {estimatedTime} 
+                    
                 </Typography>
                 
                 </React.Fragment>

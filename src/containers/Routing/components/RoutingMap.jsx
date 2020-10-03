@@ -54,18 +54,42 @@ const RoutingMap = (props) => {
     console.log("passengers",passengersRef.current)
     console.log("waypoints",waypointsRef.current)
     console.log("vehicles",vehiclesRef.current)
-    console.log("destiny",fixedMarker)
+    console.log("destiny",destinyMarkerRef.current)
     console.log("origin",originMarkerRef.current)
-    const visits = WaypointServiceModel(waypointsRef.current) 
+    const visits =[{ id: 1232,
+      demand:22,
+      latitude:-27.143475,
+      longitude: -48.899026,
+      description:"",
+      plannerId:1,}] //WaypointServiceModel(waypointsRef.current) 
     const vehicles = [{id:"1",name:"1232",capacity:"20"}]//WaypointServiceModel(waypointsRef.current) 
     const routes = []//WaypointServiceModel(waypointsRef.current) 
     const distance = 0
     const origin = DepotServiceModel(originMarkerRef.current)
-    const destiny = DepotServiceModel(fixedMarker)
+    const destiny = DepotServiceModel(destinyMarkerRef.current)
     function sucessCallback(res){
       console.log('open');
       sock.send('/app/clear');
-      sock.send('/app/planning', JSON.stringify({distance,origin,destiny:origin,vehicles,visits}));
+     
+      
+      sock.send('/app/planning', JSON.stringify({distance,origin,destiny,vehicles,visits}));
+   
+          sock.subscribe('/topic/route', (message) => {
+            Object.keys(routesRef.current).map((route)=>{
+              removeRoute(route)
+            })
+            const plan = JSON.parse(message.body);
+            console.log(plan)
+            if(plan.routes){
+              plan.routes.forEach((route)=>{
+                let newRoute = new Route(route)
+                console.log(newRoute)
+                setRoutes({ ...routesRef.current, ...{ [newRoute.getId()]: newRoute } })
+              })
+            }
+            
+          });
+      
     }
     function errorCallback(res){}
     var sock = socketFactory(sucessCallback,errorCallback)
@@ -307,12 +331,20 @@ const RoutingMap = (props) => {
   /** UPDATES ON STATES */
   const routesUpdate = () => setRoutes({ ...routesRef.current })
   
-  /** PASSENGERS */
+  /** Origin */
   const [originMarker, _setOriginMarker] = useState()
   const originMarkerRef = React.useRef(originMarker)
   const setOriginMarker = data => {
     originMarkerRef.current = data
     _setOriginMarker(data)
+  }
+    
+  /** Destiny */
+  const [destinyMarker, _setDestinyMarker] = useState()
+  const destinyMarkerRef = React.useRef(destinyMarker)
+  const setDestinyMarker = data => {
+    destinyMarkerRef.current = data
+    _setDestinyMarker(data)
   }
   /** PASSENGERS */
   const [passengers, _setPassengers] = useState({})
@@ -444,7 +476,7 @@ const RoutingMap = (props) => {
     }
   }
 
-  var fixedMarker = null
+  
   var directionsService = null
   const searchClass = classNames({
     'topbar__search-field': true,
@@ -474,44 +506,16 @@ const RoutingMap = (props) => {
 
   function removeRoute(_id) {
     var route = routesRef.current[_id]
-    return new Promise((solve, eject) => {
-      if (window.confirm("Atenção! Você está removendo uma rota, deseja continuar?")) {
-        if (typeof route != "undefined") {
-          let wpts = route.waypoints;
-          for (var i = wpts.length - 1; i >= 0; i--) {
-            var nearPoints = wpts[i].getNearPoints()
-            for (var j = nearPoints.length - 1; j >= 0; j--) {
-              nearPoints[j].waypointId = null
-              nearPoints[j].marked = false
-              nearPoints[j].marker.setOptions({
-                strokeColor: SOFT.BLUE,
-                fillColor: LIGHT.BLUE
-              });
-              if (typeof nearPoints[j].attachedPolyline != "undefined" && nearPoints[j].attachedPolyline != null) {
-                nearPoints[j].attachedPolyline.setMap(null)
-                nearPoints[j].attachedPolyline = null
-
-              }
-            }
-          }
-        }
+    
+      
+        
 
         route.terminate();
         setRoutes(objectKeyRemover(routesRef.current, _id))
 
-        Object.keys(routes).forEach(function (key, index) {
-          let wpts = routes[key].waypoints
-
-          for (var j = 0; j < wpts.length; j++) {
-            //waypoints.findNearPoints(routes[key], wpts[j]);
-
-          }
-
-        });
+        
         //remove address attached to waypoints
-        solve()
-      }
-    })
+      
 
 
   }
@@ -675,17 +679,17 @@ const RoutingMap = (props) => {
       [ORIGIN]: "setOrigin",
       [DESTINY]: "setDestiny"
     }
-    if (!!!fixedMarker) {
+    if (!!!destinyMarkerRef.current) {
 
       setFixedMark(setMarkerIcon({ marker, type }))
       let routes = routesRef.current
       Object.keys(routes).forEach((key) => {
-        routes[key][setMarkerType[type]](fixedMarker);
+        routes[key][setMarkerType[type]](destinyMarkerRef.current);
       })
 
     } else {
       marker.setMap(null)
-      fixedMarker.setPosition(marker.getPosition())
+      destinyMarkerRef.current.setPosition(marker.getPosition())
     }
     /*
     if (!!fixedMarker)
@@ -831,8 +835,8 @@ const RoutingMap = (props) => {
   const setFixedMark = (marker) => {
     if (typeof marker == "undefined") throw "marker is undefined!"
     //if (typeof fixedMarker != "undefined" && fixedMarker != null) fixedMarker.setMap(null)
-
-    fixedMarker = marker
+    setDestinyMarker(marker)
+    
 
     //marker.addListener("dragend", calculateAndDisplayRoute);
   }
