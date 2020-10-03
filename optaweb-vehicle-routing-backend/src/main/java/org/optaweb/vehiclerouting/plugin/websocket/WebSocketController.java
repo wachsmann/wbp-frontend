@@ -143,7 +143,32 @@ class WebSocketController {
      */
     @MessageMapping("/planning")
     void addPlan(PortableRouting request) {
+        
+        
+        
+        Coordinates originCoordinates = new Coordinates(request.getOrigin().getLatitude(),request.getOrigin().getLongitude());
+        Coordinates destinyCoordinates = new Coordinates(request.getDestiny().getLatitude(),request.getDestiny().getLongitude());
+        
+        // Add origin
+        locationService.createLocation(originCoordinates, "",0,1);
+         //add Destiny
+         locationService.createLocation(destinyCoordinates, "",0,1);
+        //Add Visits
+        for (PortableLocation visit : request.getVisits()) {
+            
+            locationService.createLocation(
+                new Coordinates(visit.getLatitude(),visit.getLongitude()), "",visit.getDemand(),
+                1
+            );
+
+        }
        
+        
+        request.getVehicles().forEach(vehicle -> vehicleService.createVehicle(1,vehicle.getCapacity()));
+        
+        // TODO start randomizing only after using all available cities (=> reproducibility for small demos)
+        //routingProblem.visits().forEach(visit -> addWithRetry(visit.coordinates(), visit.description()));
+        //routingProblem.vehicles().forEach(vehicleService::createVehicle);
        logger.info(request.toString());
     }
 
@@ -161,8 +186,8 @@ class WebSocketController {
     }
 
     @MessageMapping({"vehicle"})
-    void addVehicle(long plannerId) {
-        vehicleService.createVehicle(plannerId);
+    void addVehicle(long plannerId, int capacity) {
+        vehicleService.createVehicle(plannerId,capacity);
     }
 
     /**

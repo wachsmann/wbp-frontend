@@ -46,12 +46,12 @@ public class VehicleService {
         this.vehicleRepository = vehicleRepository;
     }
 
-    public void createVehicle(long plannerId) {
+    public void createVehicle(long plannerId,int capacity) {
         final Optional<PlannerEntity> optionalPlannerEntity = plannerRepository.findById(plannerId);
         final PlannerEntity plannerEntity = optionalPlannerEntity.orElseThrow(
                 () -> new IllegalArgumentException("Planner{id=" + plannerId + "} doesn't exist")
         );
-        Vehicle vehicle = vehicleRepository.createVehicle(DEFAULT_VEHICLE_CAPACITY,plannerEntity);
+        Vehicle vehicle = vehicleRepository.createVehicle(capacity,plannerEntity);
         addVehicle(vehicle);
     }
 

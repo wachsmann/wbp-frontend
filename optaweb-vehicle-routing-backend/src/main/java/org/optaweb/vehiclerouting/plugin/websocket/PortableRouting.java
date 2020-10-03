@@ -116,20 +116,20 @@ class PortableRouting {
     public _PortableLocation getOrigin() {
         return origin;
     }
-/*
+
     public List<PortableVehicle> getVehicles() {
         return vehicles;
     }
 
    
     
-    public PortableLocation getDestiny() {
+    public _PortableLocation getDestiny() {
         return destiny;
     }
     public List<PortableLocation> getVisits() {
         return visits;
     }
-
+/*
     public List<PortableRoute> getRoutes() {
         return routes;
     }
