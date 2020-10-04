@@ -12,14 +12,14 @@ class Map extends Component {
   constructor(props) {
     super()
     this.onScriptLoad = this.onScriptLoad.bind(this)
-    
+
   }
-  
+
   onScriptLoad() {
     const map = new window.google.maps.Map(
       document.getElementById(this.props.id),
       this.props.options);
-      
+
     this.props.onMapLoad(map)
   }
 
@@ -34,89 +34,90 @@ class Map extends Component {
       //We cannot access google.maps until it's finished loading
       s.addEventListener('load', e => {
         this.onScriptLoad()
-        
+
       })
-     
+
     } else {
       this.onScriptLoad()
     }
   }
-  
+
   render() {
-    const {mapRef,routeProps,passengerProps} = this.props
-    
+    const { mapRef, routeProps, passengerProps } = this.props
+
     return (
       <div style={
-          { 
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-           }
-          } id={this.props.id} >
-            
-            <MainSideBar 
-              ref={mapRef.mainSideBarRef} 
-              t={this.props.t}
-              loading={this.props.loading}
-              handleRoutingSave={this.props.handleRoutingSave}
-           
-              /** ROUTES */
-              routeProps={routeProps}
-             
-              /** PASSENGER */
-              passengerProps={passengerProps}
+        {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+        }
+      } id={this.props.id} >
 
-              passengerModalOpen={this.props.passengerModalOpen}
-              passengerSelected={this.props.passengerSelected}
-              setPassengerModalOpen={this.props.setPassengerModalOpen}
+        <MainSideBar
+          ref={mapRef.mainSideBarRef}
+          t={this.props.t}
+          distance={this.props.distance}
+          loading={this.props.loading}
+          handleRoutingSave={this.props.handleRoutingSave}
 
-              /** RADIUS */
-              getCurrentRadius={this.props.getCurrentRadius}
-              generalRadius={this.props.generalRadius}
-              handleGeneralRadius={this.props.handleGeneralRadius}
+          /** ROUTES */
+          routeProps={routeProps}
+
+          /** PASSENGER */
+          passengerProps={passengerProps}
+
+          passengerModalOpen={this.props.passengerModalOpen}
+          passengerSelected={this.props.passengerSelected}
+          setPassengerModalOpen={this.props.setPassengerModalOpen}
+
+          /** RADIUS */
+          getCurrentRadius={this.props.getCurrentRadius}
+          generalRadius={this.props.generalRadius}
+          handleGeneralRadius={this.props.handleGeneralRadius}
 
 
-              id="main-bar"
-            
-            ></MainSideBar>
-            <TopBarActions ref={mapRef.topBarActionsRef} pinTypeProps={this.props.pinTypeProps} />
-            
-            <PassengerImportsButtonControl
-              
-              generalRadius={this.props.generalRadius}
-              passengerProps={passengerProps}
-              routes={routeProps.routes} 
-              ref={mapRef.passengerControlRef}
-            />
-            <SolveButtonControl
-              handleSolveAction={this.props.handleSolveAction}
-             ref={mapRef.solveControlRef}
-            />
-          <VehicleImportsButtonControl
-              generalRadius={this.props.generalRadius}
-              vehicleProps={this.props.vehicleProps}
-              
-              ref={mapRef.vehicleControlRef}
-            />
-              <ConfigurationButtonControl
-                 t={this.props.t}
-               
-                
-                 /** ROUTES */
-                 routeProps={routeProps}
-                
-               
-               
-                 /** RADIUS */
-                 getCurrentRadius={this.props.getCurrentRadius}
-                 generalRadius={this.props.generalRadius}
-                 handleGeneralRadius={this.props.handleGeneralRadius}
-   
-              ref={mapRef.configurationControlRef}
-            />
-        </div>
+          id="main-bar"
+
+        ></MainSideBar>
+        <TopBarActions ref={mapRef.topBarActionsRef} pinTypeProps={this.props.pinTypeProps} />
+
+        <PassengerImportsButtonControl
+
+          generalRadius={this.props.generalRadius}
+          passengerProps={passengerProps}
+          routes={routeProps.routes}
+          ref={mapRef.passengerControlRef}
+        />
+        <SolveButtonControl
+          handleSolveAction={this.props.handleSolveAction}
+          ref={mapRef.solveControlRef}
+        />
+        <VehicleImportsButtonControl
+          generalRadius={this.props.generalRadius}
+          vehicleProps={this.props.vehicleProps}
+
+          ref={mapRef.vehicleControlRef}
+        />
+        <ConfigurationButtonControl
+          t={this.props.t}
+
+
+          /** ROUTES */
+          routeProps={routeProps}
+
+
+
+          /** RADIUS */
+          getCurrentRadius={this.props.getCurrentRadius}
+          generalRadius={this.props.generalRadius}
+          handleGeneralRadius={this.props.handleGeneralRadius}
+          applyGeneralRadius={this.props.applyGeneralRadius}
+          ref={mapRef.configurationControlRef}
+        />
+      </div>
     );
   }
 }

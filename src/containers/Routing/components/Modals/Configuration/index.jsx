@@ -6,16 +6,19 @@ import ConfigurationModal from './ConfigurationModal';
 
 export default React.forwardRef((props, ref) => {
     
-    const {t,generalRadius,handleGeneralRadius} = props
-    const [open, setOpen] = React.useState(false);
+    const {t,generalRadius,handleGeneralRadius,applyGeneralRadius} = props
+    
     const handleClose = () => {
-        setOpen(false);
+      debugger
+        applyGeneralRadius()
+        setConfigurationOpen(false);
     };
     const [openConfiguration, setConfigurationOpen] = React.useState(false);
     const [openSaveInfo, setSaveInfo] = React.useState(false);
 
     const handleConfigurationOpen = () => {
       setConfigurationOpen(!openConfiguration);
+    
     };
     const handleSaveInfoOpen = () => {
       setSaveInfo(!openSaveInfo);
@@ -28,7 +31,7 @@ export default React.forwardRef((props, ref) => {
                 t={t} open={openConfiguration}
                 generalRadius={generalRadius}
                 handleGeneralRadius={handleGeneralRadius}
-                handleClose={handleConfigurationOpen} />
+                handleClose={handleClose} />
         </div>
     );
 })

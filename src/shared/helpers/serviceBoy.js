@@ -9,7 +9,7 @@ import axios from "axios"
 import urlAppender from "./urlAppender"
 import { getToken } from '../../shared/helpers/authBoy'
 
-const getHeaders = (hasHeaders) => (hasHeaders ? {headers:{'Authorization':`Bearer ${getToken()}`}} : {headers:{}})
+export const getHeaders = (hasHeaders) => (hasHeaders ? {headers:{'Authorization':`Bearer ${getToken()}`}} : {headers:{}})
 
 export const serviceBoy = {
     get:(path,hasHeader = true)=> (axios.get(urlAppender(path), getHeaders(hasHeader))),

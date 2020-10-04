@@ -70,14 +70,10 @@ const LoginForm = (props) => {
         </div>
       </div>
 
-      <div className="account__btns">
+      <div style={{width:"100%"}}>
         
-            <Button className="account__btn" submit="true" color="primary" disabled={!!syncErrors}>Entrar</Button>
-            
-              
- 
-        <NavLink className="btn btn-outline-secondary account__btn"  to="/registra">Criar Conta
-        </NavLink>
+            <Button className="btn btn-primary" style={{width:"100%"}} submit="true" color="primary" disabled={!!syncErrors}>Entrar</Button>
+            <Button  color="secondary" style={{width:"100%"}} onClick={()=>history.push('/registra')} >Criar Conta</Button>
       </div>
     </form>
   )

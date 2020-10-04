@@ -11,10 +11,10 @@ import WaypointInfo from './Modals/WaypointInfo'
 import PassengerAddress from './Modals/PassengerAddress';
 import PassengerInfo from './Modals/PassengerInfo';
 import { STOP } from '../utils/constants';
-
+import Typography from '@material-ui/core/Typography';
 export default React.forwardRef((props, ref) => {
-  const { routeProps, passengerProps, generalRadius, passengerModalOpen, setPassengerModalOpen, passengerSelected} = props
-
+  const { routeProps, passengerProps, generalRadius, passengerModalOpen, setPassengerModalOpen, passengerSelected,distance} = props
+console.log(distance)
   const [open, setOpen] = useState(false)
   const [infoModalOpen, setInfoModalOpen] = useState(false)
 
@@ -150,6 +150,9 @@ export default React.forwardRef((props, ref) => {
         <Scrollbar className="sidebar__scroll scroll">
           <div className="sidebar__wrapper sidebar__wrapper--desktop">
             <MainCard {...props} />
+            <Typography variant="caption" display="block">
+              Tempo estimado:{distance}
+            </Typography>
             <Divider />
             <RouteList routes={routeProps.routes} removeRoute={routeProps.removeRoute} handleItemClick={handleItemClick} />
             {

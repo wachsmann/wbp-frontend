@@ -1,15 +1,17 @@
 import { RouteWaypoint } from "../model";
 import { Waypoint } from "../model/Waypoint";
+import { LIGHT } from "./constants";
 import { getRandomColor } from "./utils";
 
 
 var waypoints = []
 
 export function initMap(radius,passengers){
-    
+    waypoints = []
     processPassengers(radius,passengers)
-    console.log(waypoints)
-    waypoints.forEach((el)=>displayBound(radius,el))
+    
+    waypoints.forEach((el)=>el.circle = displayBound(radius,el))
+
     return waypoints
     //test Search processor
     //displayBound(searchForPassengers({bounds: new window.google.window.maps.LatLngBounds(),passengers:[]}))
@@ -99,15 +101,15 @@ function searchForPassengers(radius,waypoint,passengers){
     return waypoint
 }
 function createCircle(radius,position){
-    var color = getRandomColor()
-    return new window.google.maps.Circle({strokeColor:color,strokeOpacity: 0.8,strokeWeight: 2,fillColor:color,fillOpacity: 0.85,map:window.map,center: position,radius});
+    
+    return new window.google.maps.Circle({strokeColor:LIGHT.GRAY,strokeOpacity: 0.8,strokeWeight: 2,fillColor:LIGHT.GRAY,fillOpacity: 0.85,map:window.map,center: position,radius});
 }
-function createMarker(mark){return new window.google.maps.Marker({position:mark.position,/*icon: "https://maps.google.com/mapfiles/marker" + mark.letter + ".png",*/map:window.map});}
+function createMarker(mark){return new window.google.maps.Marker({position:mark.position,icon: "https://maps.google.com/mapfiles/marker" + mark.letter + ".png",map:window.map});}
 
 function displayBound(radius,waypoint){
     var bounds = waypoint.bounds
 	console.log(bounds.getCenter().lat(),bounds.getCenter().lng())
     /** CREATE WAYPOINT  */
-    createMarker({position:new window.google.maps.LatLng(bounds.getCenter().lat(),bounds.getCenter().lng()),letter:"P"})
-    createCircle(radius,new window.google.maps.LatLng(bounds.getCenter().lat(),bounds.getCenter().lng()))
+    //createMarker({position:new window.google.maps.LatLng(bounds.getCenter().lat(),bounds.getCenter().lng()),letter:"P"})
+    return createCircle(radius,new window.google.maps.LatLng(bounds.getCenter().lat(),bounds.getCenter().lng()))
 }

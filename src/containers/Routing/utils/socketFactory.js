@@ -17,7 +17,7 @@ export function socketFactory(successCallback,errorCallback) {
       });
       
       stompClient.connect(
-        {}, // no headers
+        headerClient, // no headers
         successCallback,
         errorCallback,
       );

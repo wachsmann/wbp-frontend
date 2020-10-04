@@ -12,6 +12,7 @@ import { withRouter } from 'react-router-dom';
 import PersonIcon from '@material-ui/icons/Person';
 import ConfigurationModal from './Modals/Configuration/ConfigurationModal'
 import SaveInfo from './Modals/SaveInfo'
+
 const MainCard = (props) => {
     const {t,routingTitle,history,passengerProps,routeWay,setRouteWay,generalRadius,handleGeneralRadius,handleRoutingSave,customerProps} = props
     
@@ -50,11 +51,14 @@ const MainCard = (props) => {
           
           <ConfigurationModal t={t} customerProps={customerProps} open={openConfiguration} generalRadius={generalRadius} routeWay={routeWay} setRouteWay={setRouteWay} handleGeneralRadius={handleGeneralRadius}  handleClose={handleConfigurationOpen}/>
           <SaveInfo open={openSaveInfo} handleRoutingSave={handleRoutingSave} handleClose={handleSaveInfoOpen}/>
+          
           </CardActions>
+          
         }
         title="Rotas"
         subheader={routingTitle ? routingTitle : ""}
-      />
+      ></CardHeader>
+      
 
       
         </Grid>

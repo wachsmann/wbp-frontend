@@ -8,7 +8,7 @@ import { LIGHT, SOFT } from '../utils/constants';
 import { mongoObjectId } from '../utils/utils';
 
 
-export function Passenger({ id,centerPoint, marker, getRoutes, radius, identifier, name, street, neighborhood, city, cep, draggable = true, visible = true }) {
+export function Passenger({ id, marker, getRoutes, radius, identifier, name, street, neighborhood, city, cep, draggable = true, visible = true }) {
 
 
 
@@ -62,9 +62,9 @@ export function Passenger({ id,centerPoint, marker, getRoutes, radius, identifie
         this.waypointId = waypointId
         this.routeId = routeId
         if(waypointId){
-            toggleCircleActivation(true)
+            //toggleCircleActivation(true)
         }else{
-            toggleCircleActivation(false)
+            //toggleCircleActivation(false)
         }   
     }
     this.setWaypointListener = (listeners)=>{
@@ -83,14 +83,14 @@ export function Passenger({ id,centerPoint, marker, getRoutes, radius, identifie
         console.log("compute distance",distance,"r",radius)
         return (radius >= distance)
     }
-    const toggleCircleActivation = (activate) =>( activate ? this.centerPoint.setOptions({strokeColor: SOFT.GREEN,fillColor: LIGHT.GREEN}) : this.centerPoint.setOptions({strokeColor: SOFT.BLUE,fillColor: LIGHT.BLUE}))
+    //const toggleCircleActivation = (activate) =>( activate ? this.centerPoint.setOptions({strokeColor: SOFT.GREEN,fillColor: LIGHT.GREEN}) : this.centerPoint.setOptions({strokeColor: SOFT.BLUE,fillColor: LIGHT.BLUE}))
     const clearInstancesMarker = () => {
         //Clearing markers 
         this.marker.setMap(null);
-        this.centerPoint.setMap(null);
+        //this.centerPoint.setMap(null);
         //Clearing listeners
         window.google.maps.event.clearInstanceListeners(this.marker)
-        window.google.maps.event.clearInstanceListeners(this.centerPoint);
+        //window.google.maps.event.clearInstanceListeners(this.centerPoint);
     }
     function removeAttachedObjects() {
         if (attachedPolyline && attachedPolyline != null) attachedPolyline.setMap(null)
@@ -103,15 +103,17 @@ export function Passenger({ id,centerPoint, marker, getRoutes, radius, identifie
 
 
 
-    this.centerPoint = centerPoint
+    //this.centerPoint = centerPoint
     if (this.waypointId && this.waypointId != null && typeof this.waypointId != "undefined")
+        /*
         this.centerPoint.setOptions({
             strokeColor: SOFT.GREEN,
             fillColor: LIGHT.GREEN
-        });
+        })
+        */
 
     this.setRadius = (newRadius) => {
-        this.centerPoint.setRadius(parseInt(newRadius))
+        //this.centerPoint.setRadius(parseInt(newRadius))
         radius = newRadius
     }
 
@@ -203,7 +205,7 @@ export function Passenger({ id,centerPoint, marker, getRoutes, radius, identifie
         pointNameBaloon.setMap(null);
 
     });
-    this.centerPoint.bindTo('center', this.marker, 'position');
+    //this.centerPoint.bindTo('center', this.marker, 'position');
     
 }
 

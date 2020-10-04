@@ -31,7 +31,8 @@ import { initMap } from '../utils/waypointsProcessor';
 import { socketFactory } from '../utils/socketFactory';
 import WaypointServiceModel from '../model/WaypointServiceModel'
 import DepotServiceModel from '../model/DepotServiceModel';
-const headerClient = {"Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aHdhY2hzbWFubkB3YnAuY29tIiwiZXhwIjoxNjAwMzIzNjQwLCJpYXQiOjE2MDAzMDU2NDB9.eobDG4FmtiIv4FgN3jlsHKktGbx9muUlu5_leRC_M0VqGLjVZfi6C4MZXH8gkkUa_scIvW5och5eOqMCfbNjnA"}
+import { VehicleServiceModel } from '../model/VehicleServiceModel copy';
+
 var autoComplete
 const RoutingMap = (props) => {
   const { editMode, history } = props
@@ -48,7 +49,7 @@ const RoutingMap = (props) => {
   const configurationControlRef = React.createRef();
   const mainSideBarRef = React.createRef();
   const topBarActionsRef = React.createRef();
-  const togglesControlRef = React.createRef();
+
   const handleSolveAction = () => { 
     console.log("mount problem...")
     console.log("passengers",passengersRef.current)
@@ -56,14 +57,8 @@ const RoutingMap = (props) => {
     console.log("vehicles",vehiclesRef.current)
     console.log("destiny",destinyMarkerRef.current)
     console.log("origin",originMarkerRef.current)
-    const visits =[{ id: 1232,
-      demand:22,
-      latitude:-27.143475,
-      longitude: -48.899026,
-      description:"",
-      plannerId:1,}] //WaypointServiceModel(waypointsRef.current) 
-    const vehicles = [{id:"1",name:"1232",capacity:"20"}]//WaypointServiceModel(waypointsRef.current) 
-    const routes = []//WaypointServiceModel(waypointsRef.current) 
+    const visits = WaypointServiceModel(waypointsRef.current) 
+    const vehicles = VehicleServiceModel(vehiclesRef.current) 
     const distance = 0
     const origin = DepotServiceModel(originMarkerRef.current)
     const destiny = DepotServiceModel(destinyMarkerRef.current)
@@ -73,17 +68,18 @@ const RoutingMap = (props) => {
      
       
       sock.send('/app/planning', JSON.stringify({distance,origin,destiny,vehicles,visits}));
-   
+        
           sock.subscribe('/topic/route', (message) => {
             Object.keys(routesRef.current).map((route)=>{
               removeRoute(route)
             })
             const plan = JSON.parse(message.body);
             console.log(plan)
+            setDistance(plan.distance)
             if(plan.routes){
               plan.routes.forEach((route)=>{
                 let newRoute = new Route(route)
-                console.log(newRoute)
+                //console.log(newRoute)
                 setRoutes({ ...routesRef.current, ...{ [newRoute.getId()]: newRoute } })
               })
             }
@@ -305,6 +301,13 @@ const RoutingMap = (props) => {
     routesRef.current = data
     _setRoutes(data)
   }
+  const [distance, _setDistance] = useState("")
+  const distanceRef = React.useRef(distance)
+
+  const setDistance = data => {
+    distanceRef.current = data
+    _setDistance(data)
+  }
 
 
   /** ROUTE SELECTED */
@@ -404,7 +407,7 @@ const RoutingMap = (props) => {
         var vehicle = vehiclesRef.current[id]
         return new Promise((solve, eject) => {
           if (window.confirm("Atenção! Você está removendo um passageiro, deseja continuar?")) {
-            vehicle.terminate();
+            
             setVehicles(objectKeyRemover(vehiclesRef.current, id))
             solve()
           }
@@ -453,15 +456,21 @@ const RoutingMap = (props) => {
     generalRadiusRef.current = data
     _setGeneralRadius(data)
   }
+  const applyGeneralRadius = ()=>{
+    console.log("applyGeneralRadius")
+    
+    Object.keys(waypointsRef.current).map((key) => {
+      waypointsRef.current[key].terminate()
+    })
+    setWaypoints({})
+    passengerUpdate()
+  }
   const handleGeneralRadius = (radius) => {
     if (radius <= MAX_RADIUS && radius >= MIN_RADIUS) {
       setGeneralRadius(radius)
-      Object.keys(passengers).map((id) => {
-
-        passengers[id].setRadius(parseInt(radius))
-        window.google.maps.event.trigger(passengers[id].marker, 'dragend', { latLng: () => passengers[id].marker.getPosition() })
-      })
-      passengerUpdate()
+   
+      
+      
     } else {
       alert("Fora do raio permitido!")
     }
@@ -624,53 +633,7 @@ const RoutingMap = (props) => {
       /**
        * run method to iterate all routes and make them run Proximity method like when calculateAndDisplayRoutes
        */
-      var passenger = passengersRef.current[id]
-      if (passenger.waypointId) {
-        Object.keys(routesRef.current).forEach((i) => {
-          var waypoint = routesRef.current[i].getWaypoint(passenger.waypointId)
-
-          if (waypoint) {
-            if (
-              getCurrentRadius() <
-              window.google.maps.geometry.spherical.computeDistanceBetween(
-                waypoint.getPosition(),
-                passenger.marker.getPosition()
-              )
-            ) {
-              waypoint.removeNearPoint(passenger)
-              passenger.setNearWaypoint()
-            }
-          }
-        })
-      } else {
-        Object.keys(routesRef.current).forEach((i) => {
-          var wpts = routesRef.current[i].waypoints
-
-          //console.log(passenger, passenger.waypointId)
-
-          if (!passenger.waypointId)
-            Object.keys(wpts).forEach((j) => {
-
-              if (
-                getCurrentRadius() >=
-                window.google.maps.geometry.spherical.computeDistanceBetween(
-                  wpts[j].getMarker().getPosition(),
-                  passenger.marker.getPosition()
-                )
-              ) {
-
-
-                wpts[j].addNearPoint(passenger)
-                passenger.setNearWaypoint(wpts[j].getRouteId(), wpts[j].getId())
-
-                window.google.maps.event.addListener(wpts[j].getMarker(), "removeWaypoint", (event) => passenger.setNearWaypoint())
-              }
-
-            })
-
-        });
-      }
-
+ 
     })
 
   }
@@ -808,11 +771,12 @@ const RoutingMap = (props) => {
     let id = mongoObjectId()
     if (!marker)
       marker = newMarker({ position })
+      marker.zIndex = 2
     /**
      * ADD LISTENER ON MARKER
      */
     radius = parseInt(getCurrentRadius())
-
+/*
     var centerPoint = mapCirclePassengerArea(position, radius)
     centerPoint.addListener("click", (e) => {
       const marker = newMarker({ position: { lat: e.latLng.lat(), lng: e.latLng.lng() } })
@@ -820,10 +784,10 @@ const RoutingMap = (props) => {
       addMark({ marker })
 
     })
-
+*/
     addPassengerMarkerListener(marker, id)
 
-    return new Passenger({ id, radius, centerPoint, routes, marker, identifier, name, street, neighborhood, city, cep })
+    return new Passenger({ id, radius, routes, marker, identifier, name, street, neighborhood, city, cep })
 
   }
   /**
@@ -870,7 +834,8 @@ const RoutingMap = (props) => {
         loading={loading}
         handleRoutingSave={handleRoutingSave}
         /** REFS */
-        mapRef={{ passengerControlRef,vehicleControlRef,solveControlRef,configurationControlRef, mainSideBarRef, topBarActionsRef, togglesControlRef }}
+        mapRef={{ passengerControlRef,vehicleControlRef,solveControlRef,configurationControlRef, mainSideBarRef, topBarActionsRef }}
+        distance={distanceRef.current}
         /** Routes */
         routeProps={
           { routes: routesRef.current, removeRoute, routesUpdate, routeSelected: routeSelectedRef.current, setRouteSelected }}
@@ -886,6 +851,7 @@ const RoutingMap = (props) => {
 
         getCurrentRadius={getCurrentRadius}
         handleGeneralRadius={handleGeneralRadius}
+        applyGeneralRadius={applyGeneralRadius}
         generalRadius={generalRadius}
         
         /** MISC */

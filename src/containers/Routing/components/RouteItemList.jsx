@@ -31,6 +31,8 @@ export default function RouteItemList({route,removeRoute,handleItemClick}) {
   const classes = useStyles();
   const routeId = route.getId()
   const name = route.getName()
+  const vehicle = route.vehicle
+  const visits = route.visits
 
   const color = route.getColor()
   
@@ -44,11 +46,11 @@ export default function RouteItemList({route,removeRoute,handleItemClick}) {
             secondary={
                 <React.Fragment>
                 <Typography variant="caption" display="block" gutterBottom>
-                    
+                    Veículos: {vehicle.name}
                 </Typography>
                
                 <Typography variant="caption" display="block" gutterBottom>
-                    
+                Pontos atendidos: {visits.length}
                 </Typography>
                 
                 </React.Fragment>
@@ -58,9 +60,9 @@ export default function RouteItemList({route,removeRoute,handleItemClick}) {
               <Avatar className={classes.small} style={{backgroundColor:color}}>
                 <DirectionsBus fontSize="small"  />
               </Avatar>
-            <IconButton onClick={()=>{removeRoute(routeId)}} size={"small"} edge="end" aria-label="delete">
+            {/*<IconButton onClick={()=>{removeRoute(routeId)}} size={"small"} edge="end" aria-label="delete">
                 <DeleteIcon fontSize={"small"}/>
-            </IconButton>
+          </IconButton>*/}
             </ListItemSecondaryAction>
         </ListItemLink>
         <Divider />
