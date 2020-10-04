@@ -43,37 +43,38 @@ class PortableRouting {
     @JsonProperty(value = "vehicles", required = true)
     private final List<PortableVehicle> vehicles;
     @JsonProperty(value = "visits", required = true)
-    private final List<PortableLocation> visits;
+    private final List<_PortableLocation> visits;
 
     @JsonCreator
     PortableRouting(
-        @JsonProperty(value = "id")  long id,
+        
         @JsonProperty(value = "distance") long distance,
         @JsonProperty(value = "origin") Map<String,String> origin,
         @JsonProperty(value = "destiny") Map<String,String> destiny,
         @JsonProperty(value = "vehicles") Map<String,String>[] vehicles,
         @JsonProperty(value = "visits") Map<String,String>[] visits
+        
     ) {
         // TODO require non-null
         
         this.distance = Objects.requireNonNull(distance);
         _PortableLocation newOrigin = new _PortableLocation(
-            Long.parseLong(origin.get("id")),
             new BigDecimal(origin.get("latitude")),
-            new BigDecimal(origin.get("longitude"))
+            new BigDecimal(origin.get("longitude")),
+            0
         );
         _PortableLocation newDestiny = new _PortableLocation(
-            Long.parseLong(destiny.get("id")),
+            
             new BigDecimal(destiny.get("latitude")),
-            new BigDecimal(destiny.get("longitude"))
-          
+            new BigDecimal(destiny.get("longitude")),
+            0
         );
         ArrayList<PortableVehicle> newVehicles = new ArrayList<>();
       
         for (int i = 0; i < vehicles.length; i++) {
             PortableVehicle e = 
                 new PortableVehicle(
-                    Long.parseLong(vehicles[i].get("id")),
+                    vehicles[i].get("id"),
                     vehicles[i].get("name"),
                     Integer.parseInt(vehicles[i].get("capacity"))
                 );
@@ -81,24 +82,23 @@ class PortableRouting {
             newVehicles.add(e);
             logger.info(vehicles[i].get("capacity"));
         }
-        logger.info("VISITS SIZES");
-        logger.info(String.valueOf(visits.length));
-        ArrayList<PortableLocation> newVisits = new ArrayList<>();
+        
+        
+        ArrayList<_PortableLocation> newVisits = new ArrayList<>();
+        
         for (int i = 0; i < visits.length; i++) {
-            PortableLocation v = 
-                new PortableLocation(
-                    Long.parseLong(visits[i].get("id")),
+            _PortableLocation v = 
+                new _PortableLocation(
+                    
                     new BigDecimal(visits[i].get("latitude")),
                     new BigDecimal(visits[i].get("longitude")),
-                    visits[i].get("description"),
-                    Integer.parseInt(visits[i].get("demand")),
-                    Long.parseLong(visits[i].get("plannerId"))
-
+                    Integer.parseInt(visits[i].get("demand"))
                 );
 
                 newVisits.add(v);
             logger.info(visits[i].get("demand"));
         }
+        
         this.origin = newOrigin;
         this.destiny = newDestiny;
         this.vehicles = newVehicles;
@@ -126,7 +126,7 @@ class PortableRouting {
     public _PortableLocation getDestiny() {
         return destiny;
     }
-    public List<PortableLocation> getVisits() {
+    public List<_PortableLocation> getVisits() {
         return visits;
     }
 /*

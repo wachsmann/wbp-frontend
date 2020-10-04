@@ -86,7 +86,7 @@ class DistanceMatrixImpl implements DistanceMatrix {
         long distance = distanceRepository.getDistance(from, to);
         if (distance < 0) {
             distance = distanceCalculator.travelTimeMillis(from.coordinates(), to.coordinates());
-            distanceRepository.saveDistance(from, to, distance);
+            //distanceRepository.saveDistance(from, to, distance);
         }
         return Distance.ofMillis(distance);
     }

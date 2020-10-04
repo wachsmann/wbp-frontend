@@ -25,22 +25,22 @@ import org.optaweb.vehiclerouting.domain.Vehicle;
  */
 class PortableVehicle {
 
-    private final long id;
+    private final String id;
     private final String name;
     private final int capacity;
 
     static PortableVehicle fromVehicle(Vehicle vehicle) {
         Objects.requireNonNull(vehicle, "vehicle must not be null");
-        return new PortableVehicle(vehicle.id(), vehicle.name(), vehicle.capacity());
+        return new PortableVehicle(String.valueOf(vehicle.id()), vehicle.name(), vehicle.capacity());
     }
 
-    PortableVehicle(long id, String name, int capacity) {
+    PortableVehicle(String id, String name, int capacity) {
         this.id = id;
         this.name = Objects.requireNonNull(name);
         this.capacity = capacity;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 

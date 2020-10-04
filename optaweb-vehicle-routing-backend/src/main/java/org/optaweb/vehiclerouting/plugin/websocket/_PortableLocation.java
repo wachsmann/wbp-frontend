@@ -28,28 +28,25 @@ import org.optaweb.vehiclerouting.domain.Location;
  */
 public class _PortableLocation {
 
-    private long id;
-
+    private String id;
     
     private BigDecimal latitude;
     
     private BigDecimal longitude;
 
-
+    private int demand;
 
     _PortableLocation(
-            long id,
             BigDecimal latitude,
-            BigDecimal longitude
-           
+            BigDecimal longitude,
+            int demand
     ) {
-        this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
-
+        this.demand = demand;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
@@ -60,7 +57,14 @@ public class _PortableLocation {
     public BigDecimal getLongitude() {
         return longitude;
     }
+    
+    public void setDemand(int demand){
+        this.demand = demand;
+    }
 
+    public int getDemand(){
+        return demand;
+    }
  
 
     @Override

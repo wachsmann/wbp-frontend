@@ -154,7 +154,7 @@ class WebSocketController {
          //add Destiny
          locationService.createLocation(destinyCoordinates, "",0,1);
         //Add Visits
-        for (PortableLocation visit : request.getVisits()) {
+        for (_PortableLocation visit : request.getVisits()) {
             
             locationService.createLocation(
                 new Coordinates(visit.getLatitude(),visit.getLongitude()), "",visit.getDemand(),
