@@ -6,11 +6,11 @@ import routingReducer from './routingReducer'
 import { reducer as reduxFormReducer } from 'redux-form';
 const rootReducer = {
   
-  sidebar:sidebarReducer,
-  rtl:rtlReducer,
+  //sidebar:sidebarReducer,
+  //rtl:rtlReducer,
   auth:authReducer,
   form: reduxFormReducer, // mounted under "form",
-  theme: themeReducer,
+  //theme: themeReducer,
   routing:routingReducer 
  
 };

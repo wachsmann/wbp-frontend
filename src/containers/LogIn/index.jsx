@@ -1,6 +1,6 @@
 import React from 'react';
 
-import LogInFormPhoto from './components/Form';
+import LogInForm from './components/Form';
 
 import AuthService from '../../redux/services/AuthService';
 import {actions}  from '../../redux/reducers/authReducer'
@@ -23,7 +23,7 @@ const LogIn = (props) => {
           <div className="account__head">
             <h4 className="account__subhead subhead">Planejador de roteamentos fretados no transporte de passageiros</h4>
           </div>
-          <LogInFormPhoto onSubmit={onSubmit} fieldUser="E-mail" typeFieldUser="email" />
+          <LogInForm onSubmit={onSubmit} history={history} fieldUser="E-mail" typeFieldUser="email" />
 
         </div>
       </div>

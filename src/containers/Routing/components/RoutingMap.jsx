@@ -21,7 +21,6 @@ import Loader from './Loader';
 import RoutingService from '../../../redux/services/RoutingService';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { THEME } from '../../../redux/reducers/themeReducer'
 import { withRouter } from 'react-router';
 
 import newMarker from '../utils/newMarker';
@@ -31,15 +30,14 @@ import { initMap } from '../utils/waypointsProcessor';
 import { socketFactory } from '../utils/socketFactory';
 import WaypointServiceModel from '../model/WaypointServiceModel'
 import DepotServiceModel from '../model/DepotServiceModel';
-import { VehicleServiceModel } from '../model/VehicleServiceModel copy';
-
-var autoComplete
+import { VehicleServiceModel } from '../model/VehicleServiceModel';
+var sock;
 const RoutingMap = (props) => {
   const { editMode, history } = props
   const id = editMode ? props.match.params.id : null
 
   const dispatch = useDispatch()
-  const theme = useSelector(state => state.theme.className)
+
 
   const serviceRouting = new RoutingService(routingAction)
  
@@ -51,30 +49,31 @@ const RoutingMap = (props) => {
   const topBarActionsRef = React.createRef();
 
   const handleSolveAction = () => { 
-    console.log("mount problem...")
-    console.log("passengers",passengersRef.current)
-    console.log("waypoints",waypointsRef.current)
-    console.log("vehicles",vehiclesRef.current)
-    console.log("destiny",destinyMarkerRef.current)
-    console.log("origin",originMarkerRef.current)
     const visits = WaypointServiceModel(waypointsRef.current) 
     const vehicles = VehicleServiceModel(vehiclesRef.current) 
-    const distance = 0
     const origin = DepotServiceModel(originMarkerRef.current)
     const destiny = DepotServiceModel(destinyMarkerRef.current)
-    function sucessCallback(res){
-      console.log('open');
+    if(
+      visits.length > 0 && 
+      vehicles.length > 0 &&
+      !!origin &&
+      !!destiny
+    ){
+     
       sock.send('/app/clear');
      
-      
-      sock.send('/app/planning', JSON.stringify({distance,origin,destiny,vehicles,visits}));
+      //dispatch(serviceRouting.solve({origin,destiny,vehicles,visits}))
+      sock.send('/app/planning', JSON.stringify({origin,destiny,vehicles,visits}));
         
           sock.subscribe('/topic/route', (message) => {
+            
             Object.keys(routesRef.current).map((route)=>{
               removeRoute(route)
             })
             const plan = JSON.parse(message.body);
-            console.log(plan)
+            
+            setRoutePlan(plan)
+            //dispatch(serviceRouting.solution(plan))
             setDistance(plan.distance)
             if(plan.routes){
               plan.routes.forEach((route)=>{
@@ -85,10 +84,33 @@ const RoutingMap = (props) => {
             }
             
           });
+    }else{
+      alert("Configurações incompletas, por favor insira passageiros, veículos, origem e destino!")
+    }
+   
+  }
+
+  const [routePlan, setRoutePlan] = useState()
+  const [loading, setLoading] = useState(true)
+  const handleLoading = (status) => setLoading(status)
+
+  /** PIN TYPE */
+  const [pinType, _setPinType] = useState(ORIGIN)
+  const pinTypeRef = React.useRef(pinType)
+  const setPinType = data => {
+
+    pinTypeRef.current = data
+    _setPinType(data)
+  }
+  
+  useEffect(() => {
+    function sucessCallback(res){
+      console.log('open');
+      
       
     }
     function errorCallback(res){}
-    var sock = socketFactory(sucessCallback,errorCallback)
+    sock = socketFactory(sucessCallback,errorCallback)
     console.log(sock)
    
     sock.onopen = function() {
@@ -104,23 +126,6 @@ const RoutingMap = (props) => {
     sock.onclose = function() {
         console.log('close');
     };
-  }
-
-  const [query, setQuery] = useState("")
-  const [loading, setLoading] = useState(true)
-  const handleLoading = (status) => setLoading(status)
-
-  /** PIN TYPE */
-  const [pinType, _setPinType] = useState(ORIGIN)
-  const pinTypeRef = React.useRef(pinType)
-  const setPinType = data => {
-
-    pinTypeRef.current = data
-    _setPinType(data)
-  }
-  
-  useEffect(() => {
-
     if (editMode) {
       
       //dispatch(service.getItem('routing', id))
@@ -184,64 +189,8 @@ const RoutingMap = (props) => {
            
 
           if (!!newRoute) {
-            //Waypoints
-            /*
-            route.waypoints.map((wpt, index) =>
             
-            newRoute.insertWaypoint(new RouteWaypoint({
-                routeIdentity: route.id,
-                
-                _name: wpt.name,
-                marker: newMarker({ position: !!wpt.position.coordinates ? 
-                  { lat: wpt.position.coordinates[1], lng: wpt.position.coordinates[0] } : {lat:0,lng:0} }),
-                routeListenerUpdate,
-                color: route.color,
-                type: STOP,
-                label: index.toString(),
-                visible: false
-              }))
-            )
-            */
-            //Leg
-            var path = []
-            if (!!route.course) {
-              path = route.course.coordinates.map(
-                (item) => {
-                  return new window.google.maps.LatLng(item[1], item[0])
-                }
-              )
-              let legs = route.leg.map(
-                (item) => {
-                  var steps = item.steps.map((step) => {
-                    return {
-                      distance: step.distance,
-                      duration: step.duration,
-                      end_location: new window.google.maps.LatLng(step.end_location.lat, step.end_location.lng),
-                      end_point: new window.google.maps.LatLng(step.end_point.lat, step.end_point.lng),
-                      instructions: step.instructions,
-                      maneuver: step.maneuver,
-                      start_location: new window.google.maps.LatLng(step.start_location.lat, step.start_location.lng),
-                      start_point: new window.google.maps.LatLng(step.start_point.lat, step.start_point.lng),
-                    }
-
-                  })
-                  return {
-                    distance: item.distance,
-                    duration: item.duration,
-                    end_address: item.end_address,
-                    end_location: new window.google.maps.LatLng(item.end_location.lat, item.end_location.lng),
-                    start_address: item.start_address,
-                    start_location: new window.google.maps.LatLng(item.start_location.lat, item.start_location.lng),
-                    steps
-                  }
-                }
-              )
-
-
-              drawGDirLine({ leg: legs, summary: route.summary, path }, newRoute)
-            } else {
-              //calculateAndDisplayRoute()
-            }
+           
           }
 
         })
@@ -265,21 +214,22 @@ const RoutingMap = (props) => {
     }
   }
 
+
   /** ROUTE */
+  
   const handleRoutingSave = (name) => {
-    let routing = {
-      name,
-      routes: new RouteServiceModel(routesRef.current),
-      clusterPoints: new PassengerServiceModel(passengersRef.current),
-      radiusRange: getCurrentRadius(),
-      
-      id_responsable: null,
-      
-      trafficModel: "pessimistic",
-      destiny_time: "10:00",
-      companies: [],
-      
+    
+    
+    if(routePlan){
+      const visits = WaypointServiceModel(waypointsRef.current) 
+      const vehicles = VehicleServiceModel(vehiclesRef.current) 
+      const origin = DepotServiceModel(originMarkerRef.current)
+      const destiny = DepotServiceModel(destinyMarkerRef.current)
+      const routes = routePlan.routes
+
+      sock.send('/app/planning/store', JSON.stringify({name:routingNameRef.current,radius:getCurrentRadius(),visits,vehicles,origin,destiny,routes}))
     }
+    /*
     if (editMode) {
       //return dispatch(service.update('group', undefined, Object.assign({ id }, formData),history))
       routing.id = id
@@ -291,9 +241,17 @@ const RoutingMap = (props) => {
       )
 
     }
-
+*/
 
   }
+  
+  const [routingName, _setRoutingName] = useState("")
+  const routingNameRef = React.useRef(routingName)
+  const setRoutingName = data => {
+    routingNameRef.current = data
+    _setRoutingName(data)
+  }
+
   const [routes, _setRoutes] = useState({})
   const routesRef = React.useRef(routes)
 
@@ -310,27 +268,7 @@ const RoutingMap = (props) => {
   }
 
 
-  /** ROUTE SELECTED */
-  const [routeSelected, _setRouteSelected] = useState(null)
-  const routeSelectedRef = React.useRef(routeSelected)
-  const setRouteSelected = data => {
-    routeSelectedRef.current = data
-    _setRouteSelected(data)
-  }
-  useEffect(() => {
-    if (!!routeSelectedRef.current) {
-      /**
-       * show all
-       */
-      Object.keys(routesRef.current).map(key => {
-        if (routeSelectedRef.current.getId() !== routesRef.current[key].getId())
-          routesRef.current[key].setActions(false)
-      })
-    } else {
-
-      Object.keys(routesRef.current).map(key => routesRef.current[key].setActions(true))
-    }
-  }, [routeSelected])
+ 
   /** UPDATES ON STATES */
   const routesUpdate = () => setRoutes({ ...routesRef.current })
   
@@ -476,31 +414,13 @@ const RoutingMap = (props) => {
     }
 
   }
-  const getCurrentRadius = () => {
-
-    if (routeSelectedRef.current && routeSelectedRef.current.getRadius() > 0) {
-      return routeSelectedRef.current.getRadius()
-    } else {
-      return generalRadiusRef.current
-    }
-  }
-
-  
-  var directionsService = null
-  const searchClass = classNames({
-    'topbar__search-field': true,
-    'topbar__search-field--open': true
-  });
-
-  
-
+  const getCurrentRadius = () => generalRadiusRef.current
   const clickerListener = ({ e, map }) => {
 
     const marker = newMarker({ position: { lat: e.latLng.lat(), lng: e.latLng.lng() } })
     addMark({ marker })
 
   }
- 
   /**
   * ROUTING CLASS
   */
@@ -513,103 +433,21 @@ const RoutingMap = (props) => {
   
   */
 
-  function removeRoute(_id) {
-    var route = routesRef.current[_id]
+ function removeRoute(_id) {
+  var route = routesRef.current[_id]
+  
     
       
-        
 
-        route.terminate();
-        setRoutes(objectKeyRemover(routesRef.current, _id))
+      route.terminate();
+      setRoutes(objectKeyRemover(routesRef.current, _id))
 
-        
-        //remove address attached to waypoints
       
+      //remove address attached to waypoints
+    
 
 
-  }
-
-  const passengersProximityToWaypoint = (waypoint) => {
-
-    var passengers = passengersRef.current
-    Object.keys(passengers).map((key) => {
-
-      var passenger = passengers[key]
-      if (!passenger.waypointId || passenger.waypointId === waypoint.getId()) {
-        let passengerPosition = passenger.marker.getPosition()
-        let waypointPosition = waypoint.getMarker().getPosition()
-
-        if (getCurrentRadius() >= window.google.maps.geometry.spherical.computeDistanceBetween(passengerPosition, waypointPosition)) {
-
-          var listeners = {
-            dragendWaypoint: waypoint.getMarker().addListener("dragend",
-              (event) => {
-                if (!passenger.checkSuperiorProximity(event.latLng)) {
-                  waypoint.removeNearPoint(passenger)
-                  passenger.setNearWaypoint()
-                }
-              }),
-
-            dragendPassenger: passenger.marker.addListener("dragend",
-              (event) => {
-
-                if (!passenger.checkSuperiorProximity(event.latLng)) {
-
-                  waypoint.removeNearPoint(passenger)
-                  passenger.setNearWaypoint()
-                }
-              }
-            )
-          }
-          passenger.setWaypointListener(listeners)
-          waypoint.addNearPoint(passenger)
-          passenger.setNearWaypoint(waypoint.getRouteId(), waypoint.getId())
-          window.google.maps.event.addListener(waypoint.getMarker(), "removeWaypoint", (event) => passenger.setNearWaypoint())
-          /**
-           * Attach passenger and set listener for remove route
-           */
-
-
-        }
-      }
-
-    })
-  }
-
-
-  /*
-  
-  *    
-  *   Callback for calculateAndDisplayRoutes, draws routes and activate listeners for dragging on it;
-  *   
-  *    @param {obj} route - current route with new path ready to be drawn
-  *    @param {integer} index - position of route in list
-  *    
-  
-  */
-
-  const drawGDirLine = (response, route) => {
-    return new Promise((resolve, reject) => {
-      let isOff = !!routeSelectedRef.current && route.getId() !== routeSelectedRef.current.getId()
-      var routePolyline = new RoutePolyline(window.map, response.path, route, /*routeListenerUpdate,*/ isOff);
-
-      route.setSummary(response.summary);
-      route.setLeg(response.leg);
-
-      if (!!route.getRoutePolyline()) {
-        //let isOff = route.getRoutePolyline().getOffColor();
-        //routePolyline.setOffColor(isOff);
-        //if (isOff) routePolyline.changePolylineColor(LIGHT.GRAY);
-
-        route.terminatePolyline();
-      }
-      route.setRoutePolyline(routePolyline)
-      setRoutes({ ...routesRef.current, ...{ [route.getId()]: route } })
-      resolve()
-    })
-
-
-  }
+}
   /*
   *    
   *   Adds a marker on map. 
@@ -668,33 +506,18 @@ const RoutingMap = (props) => {
       setOriginMarker(setMarkerIcon({ marker, color, type }))
     }
     
-    //create Route
-    //let newRoute = new Route({ fixedMarker,marker, color, routeListenerUpdate })
-    //setRoutes({ ...routesRef.current, ...{ [newRoute.getId()]: newRoute } })
-
-    //marker.addListener("dragend", (e) => makeRequest(newRoute))
-    /*
-    if (!!fixedMarker)
-      makeRequest(newRoute)
-    */
+   
   }
   const addMark = ({ marker, color = getRandomColor(), pin_type = pinTypeRef.current, load = null }) => {
-    var routeSelected = routeSelectedRef.current
+    
 
     return new Promise((resolve, reject) => {
       if (!!!marker) return null;
       switch (parseInt(pin_type)) {
         case ORIGIN:
-          //Check if theres no route selected
-          if (!!routeSelected) {
-            marker.setMap(null)
-            alert("Rota selecionada!")
-            resolve()
-          } else {
             resolve(
                 setLeaveMarker({ marker, color, type: ORIGIN }) 
             )
-          }
           break
         case DESTINY:
           resolve(
@@ -702,62 +525,6 @@ const RoutingMap = (props) => {
               createFixedMarkByType({ type: DESTINY, marker })
           
           )
-          break;
-
-        case STOP:
-
-
-          if (routeSelected == null) {
-            marker.setMap(null)
-            resolve()
-            alert("Sem Rota selecionada")
-          } else {
-            /*
-            routeSelected.insertWaypoint(
-              new RouteWaypoint(
-                {
-                  
-                  map: window.map,
-                  routeIdentity: routeSelected.getId(),
-                  marker,
-                  routeListenerUpdate,
-                  color: routeSelected.getColor(),
-                  type: STOP,
-                  label: Object.keys(routeSelected.waypoints).length.toString() 
-                }
-              )
-            )
-            */
-            //Remove and treat in makeRequest
-            //resolve(makeRequest(routeSelected))
-
-          }
-          break;
-
-        case ADDRESS:
-          /**
-           * Dealing with infos and opening modal
-           */
-          var position = marker.getPosition()
-          marker.setOptions({ draggable: true });
-          var geocoder = new window.google.maps.Geocoder();
-          geocoder.geocode({ 'location': position }, (results, status) => {
-            if (status === 'OK') {
-              if (results[0]) {
-                var addressComponents = getMapsPlacesComponents(results[0].address_components)
-                var { street, neighborhood, city, cep } = addressComponents
-                addressComponents.position = position
-                addressComponents.marker = marker
-                var passenger = createPassenger({ marker, radius: getCurrentRadius(), routes, position, identifier: "", name: "", street, neighborhood, city, cep })
-                setNewPassengerComponents(passenger)
-                setOpenNewPassengerWindow(true)
-              } else {
-                alert('Nenhum resultado obtido!');
-              }
-            } else {
-              alert('Geocode falhou: ' + status);
-            }
-          }, (err) => { alert('Não foi possível encontrar a localização escolhida.') });
           break;
         default:
           return
@@ -776,15 +543,7 @@ const RoutingMap = (props) => {
      * ADD LISTENER ON MARKER
      */
     radius = parseInt(getCurrentRadius())
-/*
-    var centerPoint = mapCirclePassengerArea(position, radius)
-    centerPoint.addListener("click", (e) => {
-      const marker = newMarker({ position: { lat: e.latLng.lat(), lng: e.latLng.lng() } })
 
-      addMark({ marker })
-
-    })
-*/
     addPassengerMarkerListener(marker, id)
 
     return new Passenger({ id, radius, routes, marker, identifier, name, street, neighborhood, city, cep })
@@ -838,7 +597,7 @@ const RoutingMap = (props) => {
         distance={distanceRef.current}
         /** Routes */
         routeProps={
-          { routes: routesRef.current, removeRoute, routesUpdate, routeSelected: routeSelectedRef.current, setRouteSelected }}
+          { routingName:routingNameRef.current,setRoutingName,routes: routesRef.current, removeRoute, routesUpdate,  }}
 
 
         /** PASSENGERS */
@@ -848,6 +607,9 @@ const RoutingMap = (props) => {
         setPassengerModalOpen={setPassengerModalOpen}
 
         vehicleProps={{vehicles:vehiclesRef.current,createVehicle, addVehicle, deleteVehicle}}
+
+        waypoints={waypointsRef.current}
+
 
         getCurrentRadius={getCurrentRadius}
         handleGeneralRadius={handleGeneralRadius}
@@ -878,7 +640,7 @@ const RoutingMap = (props) => {
           
             map.addListener('click', (e) => (clickerListener({ e, map })))
             
-            directionsService = new window.google.maps.DirectionsService()
+            
             map.setOptions({
               zoomControlOptions: {
                 position: window.google.maps.ControlPosition.RIGHT_CENTER
@@ -892,7 +654,7 @@ const RoutingMap = (props) => {
               mapTypeId: window.google.maps.MapTypeId.ROADMAP,
               zoom: 16,
               center: { lat: 41.0082, lng: 28.9784 },
-              styles: theme === THEME.DARK ? darkMode() : [],
+              styles: [],
               draggableCursor: 'default',
               gestureHandling: 'greedy',
               disableDefaultUI: true,

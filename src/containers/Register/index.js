@@ -23,7 +23,7 @@ const RegisterPage = (props) => {
         <div className="account__head">
             <h2 className="account__subhead subhead">Crie um usuário para ingressar</h2>
           </div>
-          <Form onSubmit={onSubmit} />
+          <Form history={history} onSubmit={onSubmit} />
         </div>
       </div>
     </div>

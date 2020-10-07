@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 
 const LoginForm = (props) => {
   const {
-    errorMessage, errorMsg, fieldUser, history, form,dispatch,syncErrors,handleSubmit
+    fieldUser, history,syncErrors,handleSubmit
   } = props;
   const [formData, setFormData] = useState({})
   const [showPassword, setShowPassword] = useState(false)

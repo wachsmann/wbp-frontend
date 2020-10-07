@@ -138,27 +138,27 @@ let TableBase = props => {
         [
             {
                 icon: () => <Cached fontSize="small" />,
-                tooltip: 'shared.tables.refresh',
+                tooltip: 'Atualizar',
                 isFreeAction: true,
                 onClick: (event) => handleList({ rowsPerPage, totalCount, page }),
                 type:"TABLE_REFRESH"
             },
             {
                 icon: () => <AddBox fontSize="small" />,
-                tooltip:  'shared.tables.add',
+                tooltip:  'Novo',
                 isFreeAction: true,
                 onClick: (event) => history.push(tableConfigs.actionsPaths.add),
                 type:"TABLE_ADD"
             },
             {
                 icon: () => <Edit style={{ fontSize: 15 }} />,
-                tooltip: 'shared.tables.edit',
+                tooltip: 'Editar',
                 onClick: (event, rowData) => history.push(`${tableConfigs.actionsPaths.edit}/${rowData.id}`),
                 type:"TABLE_EDIT"
             },
             {
                 icon: () => <DeleteOutline style={{ fontSize: 15 }}  />,
-                tooltip: 'shared.tables.delete',
+                tooltip: 'Excluir',
                 onClick: (event, rowData)=>{handleDelete(event, rowData).then(()=>{
                     handleList({ rowsPerPage, totalCount, page:0 })
                 })},
@@ -166,27 +166,22 @@ let TableBase = props => {
             },
             {
                 icon: () => <Send style={{ fontSize: 15 }}  />,
-                tooltip: 'shared.tables.resend',
+                tooltip: 'Reenviar',
                 onClick: (event, rowData)=>{handleResend(event, rowData).then(()=>{
                     handleList({ rowsPerPage, totalCount, page:0 })
                 })},
                 type:"TABLE_RESEND"
             },
-            {
-                icon: <Map style={{ fontSize: 15 }} />,
-                tooltip: 'test',
-                onClick: (event,rowData)=>{console.log('evt and rowdata', event, rowData)},
-                type:"OPEN_ADDRESS"
-            },
+          
         ]
 
-    const themeClass = useSelector(state => state.theme.className)
+    
     useEffect(() => {
         handleList({ rowsPerPage, totalCount, page })//.then((res)=>console.log('testing...'))
     }, []);
     const theme = createMuiTheme({
         palette: {
-            type: themeClass.replace('theme-', ''),
+            type: 'light',
             primary: {
                 main: '#2aad86',
             },
@@ -262,23 +257,24 @@ let TableBase = props => {
 
                 localization={{
                     body: {
-                        emptyDataSourceMessage: 'shared.tables.emptyDataSourceMessage'
+                        "emptyDataSourceMessage": "Nenhum registro para exibir",
                     },
                     header: {
-                        actions: 'shared.tables.actions'
+                        "actions":"Ações"
                     },
                     toolbar: {
-                        searchTooltip: 'shared.tables.searchTooltip',
-                        searchPlaceholder: 'shared.tables.searchTooltip'
+                        "searchTooltip": "Procurar",
+                      
                     },
                     pagination: {
-                        labelRowsSelect: 'shared.pagination.labelRowsSelect',
-                        labelDisplayedRows: 'shared.pagination.labelDisplayedRows',
-                        firstTooltip: 'shared.pagination.firstTooltip',
-                        previousTooltip: 'shared.pagination.previousTooltip',
-                        nextTooltip: 'shared.pagination.nextTooltip',
-                        lastTooltip: 'shared.pagination.lastTooltip'
+                        labelRowsSelect: "linhas",
+                        labelDisplayedRows: "{from}-{to} de {count}",
+                        firstTooltip: "Primeira página",
+                        previousTooltip: "Página anterior",
+                        nextTooltip: "Próxima página",
+                        lastTooltip: "Última página"
                     }
+                    
                 }}
 
                 title={tableConfigs.title}

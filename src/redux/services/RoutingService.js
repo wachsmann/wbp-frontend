@@ -8,21 +8,6 @@ const messageCodes = { FETCH_FAILURE: "routing/fetch_failure" }
 
 class RoutingService extends BaseService {
 
-    getSingleList = (path, service = serviceBoy) => async dispatch => {
-        dispatch(
-            this.actions.requestGetItems()
-        )
-
-        return service.get(`/routing`)
-        .then(
-            res => {
-                dispatch(this.actions.requestGetItemsSuccess({list: res.data }))
-            }
-        )
-        .catch((error) => {
-            dispatch(this.actions.requestGetItemsError({ error: { code: messageCodes.FETCH_FAILURE } }))
-        })
-    }
     getList = (payload = null, service = serviceBoy) => async dispatch => {
         
         dispatch(this.actions.requestGetItems({}));
@@ -67,24 +52,19 @@ class RoutingService extends BaseService {
             dispatch(this.actions.requestGetItemSuccess({ item: {} }))
         }
     }
-
-    store = (routing, history, service = serviceBoy) => async dispatch => {
+    solve = (payload)=>async dispatch=>{
+        dispatch(this.actions.requestSolution(payload));
+    }
+    solution = (payload)=>async dispatch=>{
+        dispatch(this.actions.routeSolution(payload));
+    }
+    store = (routing) => async dispatch => {
      
         dispatch(this.actions.requestStore(routing));
-        return service.post("/routing", routing)
-            .then(
-                res => {
-                    dispatch(this.actions.storeSuccess({}))
-                    //notificationDispatcherBoy({color:"success",message:"service.dataSuccessfulMessage"})
-                    history.push('/app/roteirizacao/inicio');
-                }
-            )
-            .catch((error) => {
-                dispatch(this.actions.storeFail({ error: { code: messageCodes.FETCH_FAILURE } }))
-                //notificationDispatcherBoy({color: notificationColorOptions.error,message:messageCodes.FETCH_FAILURE})
-            })
     }
-
+    storeSuccess = (history) => async dispatch => {
+        dispatch(this.actions.requestStoreSuccess());
+    }
     update = (routing, history, service = serviceBoy) => async dispatch => {
      
         dispatch(this.actions.requestUpdate({ routing }));

@@ -4,14 +4,17 @@ import WaypointServiceModel from './WaypointServiceModel'
 import ParseLatLng from '../utils/ParseLatLng'
 import ParseGeolocation from '../utils/ParseGeolocation'
 
-export function RouteServiceModel(routes) {
-    return Object.values(routes).map((route) =>
-        ({
+export function RouteServiceModel({visits,distance,vehicles,routes}) {
+    
+    return{
 
             name: route.getName(),
-            visits: [],
-        })
-    ) 
+            distance,
+            visits,
+            vehicles,
+            routes
+        }
+    
 }
 
 

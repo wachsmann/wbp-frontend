@@ -17,10 +17,10 @@ class MainWrapper extends PureComponent {
       theme, children, rtl, location,
     } = this.props;
 
-    const direction = location.pathname === '/' ? 'ltr' : rtl.direction;
+    const direction ='ltr' ;
 
     return (
-      <div className={`${theme.className} ${direction}-support`} dir={direction}>
+      <div className={`theme-light ${direction}-support`} dir={direction}>
         <div className="wrapper">
           {children}
         </div>

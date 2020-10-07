@@ -164,8 +164,8 @@ export function Passenger({ id, marker, getRoutes, radius, identifier, name, str
     var pointNameBaloon = null
     const getPointBaloonIcon = () => {
         var ballon_size = {
-            "corner": this.identifier.length * 3.888888,
-            "curve": (this.identifier.length * 3.888888) + 10
+            "corner": `Passageiro - ${this.name}`.length * 3.888888,
+            "curve": (`Passageiro - ${this.name}`.length * 3.888888) + 10
         };
         return {
             path: `M 10 0 C 0 0 0 10 10 10 L ${ballon_size["corner"]} 10 C ${ballon_size["curve"]} 10 ${ballon_size["curve"]} 0 ${ballon_size["corner"]} 0 Z`,
@@ -184,7 +184,7 @@ export function Passenger({ id, marker, getRoutes, radius, identifier, name, str
         if (pointNameBaloon === null) {
             pointNameBaloon = new window.google.maps.Marker({
                 position: e.latLng,
-                label: _this.identifier,
+                label: `Passageiro - ${this.name}`,
                 icon: getPointBaloonIcon(),
                 zIndex: 25,
                 data: {},
@@ -193,7 +193,7 @@ export function Passenger({ id, marker, getRoutes, radius, identifier, name, str
             })
         } else {
             pointNameBaloon.setPosition(e.latLng);
-            pointNameBaloon.setLabel(_this.identifier)
+            pointNameBaloon.setLabel(`Passageiro - ${this.name}`)
             pointNameBaloon.setIcon(getPointBaloonIcon())
             pointNameBaloon.setMap(map)
         }

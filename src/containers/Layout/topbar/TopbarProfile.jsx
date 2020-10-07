@@ -21,10 +21,10 @@ export default function TopbarProfile (){
         {collapse && <button type="button" className="topbar__back" onClick={toggle} />}
         <Collapse isOpen={collapse} className="topbar__menu-wrap">
           <div className="topbar__menu">
-            <TopbarMenuLink title="Page one" icon="list" path="/pages/one" />
+            {/*<TopbarMenuLink title="Page one" icon="list" path="/pages/one" />
             <TopbarMenuLink title="Page two" icon="inbox" path="/pages/two" />
-            <div className="topbar__menu-divider" />
-            <TopbarMenuLink title="Log Out" icon="exit" handleClick={()=>logout()} path="/" />
+    <div className="topbar__menu-divider" />*/}
+            <TopbarMenuLink title="Sair" icon="exit" handleClick={()=>logout()} path="/" />
           </div>
         </Collapse>
       </div>

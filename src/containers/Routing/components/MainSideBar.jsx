@@ -12,8 +12,12 @@ import PassengerAddress from './Modals/PassengerAddress';
 import PassengerInfo from './Modals/PassengerInfo';
 import { STOP } from '../utils/constants';
 import Typography from '@material-ui/core/Typography';
+import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople';
+import DirectionsBusIcon from '@material-ui/icons/DirectionsBus';
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
+import { NaturePeople } from '@material-ui/icons';
 export default React.forwardRef((props, ref) => {
-  const { routeProps, passengerProps, generalRadius, passengerModalOpen, setPassengerModalOpen, passengerSelected,distance} = props
+  const { routeProps, passengerProps,vehicleProps,waypoints, generalRadius, passengerModalOpen, setPassengerModalOpen, passengerSelected,distance} = props
 console.log(distance)
   const [open, setOpen] = useState(false)
   const [infoModalOpen, setInfoModalOpen] = useState(false)
@@ -150,9 +154,21 @@ console.log(distance)
         <Scrollbar className="sidebar__scroll scroll">
           <div className="sidebar__wrapper sidebar__wrapper--desktop">
             <MainCard {...props} />
-            <Typography variant="caption" display="block">
-              Tempo estimado:{distance}
+            <div className="general_infos">
+            <Typography className="info" variant="caption" display="block">
+            <HourglassEmptyIcon />Tempo estimado:{distance}
             </Typography>
+            <Typography className="info" variant="caption" display="block">
+            <EmojiPeopleIcon />Passageiros: {passengerProps.passengers && Object.keys(passengerProps.passengers).length}
+            </Typography>
+            <Typography className="info" variant="caption" display="block">
+            <NaturePeople />Pontos de embarque: {waypoints && Object.keys(waypoints).length}
+            </Typography>
+            <Typography className="info" variant="caption" display="block">
+            <DirectionsBusIcon />Veículos: {vehicleProps.vehicles && Object.keys(vehicleProps.vehicles).length}
+            </Typography>
+            </div>
+         
             <Divider />
             <RouteList routes={routeProps.routes} removeRoute={routeProps.removeRoute} handleItemClick={handleItemClick} />
             {

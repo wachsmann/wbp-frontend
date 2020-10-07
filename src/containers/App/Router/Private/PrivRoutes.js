@@ -4,7 +4,7 @@ import { Route,Switch } from 'react-router-dom';
 
 import ExamplePageOne from '../../../Example/index';
 import ExamplePageTwo from '../../../ExampleTwo/index';
-import { AddRouting } from '../../../Routing';
+import { AddRouting,RoutingPage } from '../../../Routing';
 
 export default ({ match }) => (
     <div>
@@ -14,8 +14,8 @@ export default ({ match }) => (
               component={AddRouting}
           />
           <Route exact
-              path={`${match.path}pages/two`}
-              component={ExamplePageTwo}
+              path={`${match.path}`}
+              component={RoutingPage}
           />
         </Switch>
     </div>

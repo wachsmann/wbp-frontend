@@ -39,14 +39,14 @@ export default function RouteItemList({route,removeRoute,handleItemClick}) {
   return (
 
     <div>
-        <ListItemLink onClick={(e)=>{handleItemClick(routeId)}} >
+        <ListItemLink >
             <ListItemText
             primary={name.length > 30 ? `${name.substring(0,30)}...`:name}
             title={name}
             secondary={
                 <React.Fragment>
                 <Typography variant="caption" display="block" gutterBottom>
-                    Veículos: {vehicle.name}
+                    Veículo: {vehicle.name}
                 </Typography>
                
                 <Typography variant="caption" display="block" gutterBottom>

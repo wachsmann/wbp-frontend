@@ -12,26 +12,14 @@ export default function SaveInfo(props) {
   const {
       open,
       handleRoutingSave,
-      handleClose
+      handleClose,
+      routingName,
+      setRoutingName
   } = props
   const ref = React.createRef();
-  const name = useSelector(state => {
-    
-    const {item} = state.routing
-    
-    return !!item && item.name ? item.name : ""
-  })
-  
-  const [routingName,setRoutingName] = useState(name)
-  
-  const handleRoutingNameChange = (e)=>{
-    setRoutingName(e.target.value)
-  }
-  
   const onClickClose = () => {
     setRoutingName(routingName)
     handleClose()
-    
   }
 
 

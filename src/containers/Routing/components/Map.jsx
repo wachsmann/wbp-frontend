@@ -68,7 +68,11 @@ class Map extends Component {
 
           /** PASSENGER */
           passengerProps={passengerProps}
-
+          /** VEHICLES */
+          vehicleProps={this.props.vehicleProps}
+           /** VEHICLES */
+          waypoints={this.props.waypoints}
+          
           passengerModalOpen={this.props.passengerModalOpen}
           passengerSelected={this.props.passengerSelected}
           setPassengerModalOpen={this.props.setPassengerModalOpen}
