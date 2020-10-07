@@ -1,6 +1,9 @@
 {
   "name": "wbplanner",
   "version": "2.5.0",
+  "engines": {
+    "node": "10.21.0"
+  },
   "private": true,
   "scripts": {
     "start": "react-scripts start",
