@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.optaweb.vehiclerouting.plugin.persistence.routing;
+package org.optaweb.vehiclerouting.plugin.persistence.route;
 
 import org.springframework.data.repository.CrudRepository;
 
 /**
- * Route repository.
+ * Routing repository.
  */
-interface RoutingCrudRepository extends CrudRepository<RoutingEntity, Long> {
+interface RouteCrudRepository extends CrudRepository<RouteEntity, Long> {
 
 }

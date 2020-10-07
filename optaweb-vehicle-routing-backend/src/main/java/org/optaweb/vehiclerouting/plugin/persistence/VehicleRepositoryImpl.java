@@ -42,9 +42,9 @@ public class VehicleRepositoryImpl implements VehicleRepository {
     }
 
     @Override
-    public Vehicle createVehicle(int capacity, PlannerEntity planner) {
+    public Vehicle createVehicle(int capacity,String name, PlannerEntity planner) {
         final long id = repository.save(new VehicleEntity(0, null, capacity,planner)).getId();
-        final VehicleEntity vehicleEntity = repository.save(new VehicleEntity(id, "Vehicle " + id, capacity,planner));
+        final VehicleEntity vehicleEntity = repository.save(new VehicleEntity(id, name, capacity,planner));
         return toDomain(vehicleEntity);
     }
 

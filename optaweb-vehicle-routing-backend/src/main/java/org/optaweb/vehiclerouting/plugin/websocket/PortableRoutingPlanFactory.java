@@ -24,17 +24,19 @@ import org.optaweb.vehiclerouting.domain.Coordinates;
 import org.optaweb.vehiclerouting.domain.Location;
 import org.optaweb.vehiclerouting.domain.RoutingPlan;
 import org.optaweb.vehiclerouting.domain.Vehicle;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Creates instances of {@link PortableRoutingPlan}.
  */
 class PortableRoutingPlanFactory {
-
+    private static final Logger logger = LoggerFactory.getLogger(PortableRoutingPlanFactory.class);
     private PortableRoutingPlanFactory() {
         throw new AssertionError("Utility class");
     }
 
     static PortableRoutingPlan fromRoutingPlan(RoutingPlan routingPlan) {
+        
         PortableDistance distance = PortableDistance.fromDistance(routingPlan.distance());
         List<PortableVehicle> vehicles = portableVehicles(routingPlan.vehicles());
         PortableLocation origin = routingPlan.origin().map(PortableLocation::fromLocation).orElse(null);

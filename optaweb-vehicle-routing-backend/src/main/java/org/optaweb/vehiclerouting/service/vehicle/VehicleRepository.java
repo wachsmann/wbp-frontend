@@ -34,7 +34,7 @@ public interface VehicleRepository {
      * @param capacity vehicle's capacity
      * @return a new vehicle
      */
-    Vehicle createVehicle(int capacity,PlannerEntity planner);
+    Vehicle createVehicle(int capacity,String name, PlannerEntity planner);
 
     /**
      * Create a vehicle from the given data.

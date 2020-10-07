@@ -1,4 +1,4 @@
-package org.optaweb.vehiclerouting.plugin.persistence.routing;
+package org.optaweb.vehiclerouting.plugin.persistence.route;
 
 
 import java.util.List;
@@ -15,6 +15,7 @@ import org.optaweb.vehiclerouting.domain.Location;
 import org.optaweb.vehiclerouting.plugin.persistence.passenger.PassengerEntity;
 
 import org.optaweb.vehiclerouting.plugin.persistence.LocationEntity;
+import org.optaweb.vehiclerouting.plugin.persistence.VehicleEntity;
 import org.optaweb.vehiclerouting.plugin.persistence.planner.PlannerEntity;
 
 import javax.persistence.Id;
@@ -24,16 +25,21 @@ import javax.persistence.Id;
  */
 
 @Entity
-public class RoutingEntity {
+public class RouteEntity {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
+
     @ManyToMany(targetEntity=LocationEntity.class, fetch=FetchType.EAGER)
     @JoinColumn(name="visit_id")
     private List<LocationEntity> visits;
     public List<LocationEntity> getVisits() {return this.visits;}
     public void setVisits(List<LocationEntity> visits) {this.visits = visits;}
+    
+    @ManyToOne(targetEntity=VehicleEntity.class)
+    private VehicleEntity vehicle;
+    
     /*
     @ManyToMany(targetEntity=LocationEntity.class, fetch=FetchType.EAGER)
     @JoinColumn(name="passenger_id")
@@ -45,15 +51,7 @@ public class RoutingEntity {
     @OneToMany(targetEntity=Route.class)
     private Set<Route> routes;
     */
-    
-    @ManyToOne(targetEntity=PlannerEntity.class)
-    private PlannerEntity planner;
-    public PlannerEntity getPlanner() {return this.planner;}
-    public void setPlanner(PlannerEntity planner) {this.planner = planner;}
 
-    private Integer rangePoint;
-    public Integer getRangePoint() {return this.rangePoint;}
-    public void setRangePoint(Integer rangePoint) {this.rangePoint = rangePoint;}
 
     private String generalDistanceLimit;
     public String getGeneralDistanceLimit() {return this.generalDistanceLimit;}

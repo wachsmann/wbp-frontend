@@ -164,20 +164,19 @@ class WebSocketController {
         }
        
         
-        request.getVehicles().forEach(vehicle -> vehicleService.createVehicle(1,vehicle.getCapacity()));
+        request.getVehicles().forEach(vehicle -> vehicleService.createVehicle(1,vehicle.getCapacity(),vehicle.getName()));
+       
+    }
+    /**
+     * Store plan.
+     * @param request new location description
+     */
+    @MessageMapping("/planning/store")
+    void storePlan(RoutingPlanStorage request) {
+        logger.info("PLANNING STORE ==================");
+        //logger.info(request.getRadius().toString());
         
-        // TODO start randomizing only after using all available cities (=> reproducibility for small demos)
-        //routingProblem.visits().forEach(visit -> addWithRetry(visit.coordinates(), visit.description()));
-        //routingProblem.vehicles().forEach(vehicleService::createVehicle);
-       logger.info(request.toString());
     }
-
-    /*
-    @MessageMapping("/demo/{name}")
-    void demo(@DestinationVariable String name) {
-        demoService.loadDemo(name);
-    }
-    */
     @MessageMapping("/clear")
     void clear() {
         // TODO do this in one step (=> new RoutingPlanService)
@@ -186,8 +185,8 @@ class WebSocketController {
     }
 
     @MessageMapping({"vehicle"})
-    void addVehicle(long plannerId, int capacity) {
-        vehicleService.createVehicle(plannerId,capacity);
+    void addVehicle(long plannerId, int capacity,String name) {
+        vehicleService.createVehicle(plannerId,capacity,name);
     }
 
     /**
