@@ -99,6 +99,11 @@
       <artifactId>jjwt</artifactId>
       <version>0.7.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-spatial</artifactId>
+      <version>5.4.22.Final</version>
+    </dependency>
     </dependencies>
    
   </dependencyManagement>
