@@ -35,10 +35,6 @@
   <!-- Modules are sorted in preferred build order. -->
   <modules>
     <module>optaweb-vehicle-routing-backend</module>
-    <module>optaweb-vehicle-routing-frontend</module>
-    <module>optaweb-vehicle-routing-standalone</module>
-    <module>optaweb-vehicle-routing-docs</module>
-    <module>optaweb-vehicle-routing-distribution</module>
   </modules>
 
   <properties>
@@ -56,24 +52,7 @@
         <artifactId>optaweb-vehicle-routing-backend</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.optaweb.vehiclerouting</groupId>
-        <artifactId>optaweb-vehicle-routing-docs</artifactId>
-        <version>${project.version}</version>
-        <type>zip</type>
-      </dependency>
-      <dependency>
-        <groupId>org.optaweb.vehiclerouting</groupId>
-        <artifactId>optaweb-vehicle-routing-frontend</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-      </dependency>
-      <!-- BOM imports -->
-      <dependency>
-        <groupId>org.optaweb.vehiclerouting</groupId>
-        <artifactId>optaweb-vehicle-routing-standalone</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+     
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -142,18 +121,7 @@
   </build>
 
   <profiles>
-    <!-- Skip Sonar plugin execution if SONARCLOUD_TOKEN is not set. -->
-    <profile>
-      <id>skipSonar</id>
-      <activation>
-        <property>
-          <name>!env.SONARCLOUD_TOKEN</name>
-        </property>
-      </activation>
-      <properties>
-        <sonar.skip>true</sonar.skip>
-      </properties>
-    </profile>
+  
     <profile>
       <id>pullRequestAnalysis-Travis</id>
       <!--
