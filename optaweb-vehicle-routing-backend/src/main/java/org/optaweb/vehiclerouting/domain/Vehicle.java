@@ -16,9 +16,6 @@
 
 package org.optaweb.vehiclerouting.domain;
 
-/**
- * Vehicle that can be used to deliver cargo to visits.
- */
 public class Vehicle extends VehicleData {
 
     private final long id;

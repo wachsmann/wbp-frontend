@@ -34,8 +34,7 @@ import org.optaweb.vehiclerouting.domain.Location;
  */
 class PortableRouting {
     private static final Logger logger = LoggerFactory.getLogger(PortableRouting.class);
-    @JsonProperty(value = "distance", required = true)
-    private final long distance;
+    
     @JsonProperty(value = "origin", required = true)
     private final _PortableLocation origin;
     @JsonProperty(value = "destiny", required = true)
@@ -44,20 +43,19 @@ class PortableRouting {
     private final List<PortableVehicle> vehicles;
     @JsonProperty(value = "visits", required = true)
     private final List<_PortableLocation> visits;
-
+    @JsonProperty(value = "plannerId", required = true)
+    private final long plannerId;
     @JsonCreator
     PortableRouting(
         
-        @JsonProperty(value = "distance") long distance,
+        @JsonProperty(value = "plannerId") long plannerId,
         @JsonProperty(value = "origin") Map<String,String> origin,
         @JsonProperty(value = "destiny") Map<String,String> destiny,
         @JsonProperty(value = "vehicles") Map<String,String>[] vehicles,
         @JsonProperty(value = "visits") Map<String,String>[] visits
         
     ) {
-        // TODO require non-null
-        
-        this.distance = Objects.requireNonNull(distance);
+        this.plannerId = plannerId;
         _PortableLocation newOrigin = new _PortableLocation(
             new BigDecimal(origin.get("latitude")),
             new BigDecimal(origin.get("longitude")),
@@ -103,16 +101,10 @@ class PortableRouting {
         this.destiny = newDestiny;
         this.vehicles = newVehicles;
         this.visits = newVisits;
-        /*
-        this.origin = Objects.requireNonNull(origin);
-        this.destiny = Objects.requireNonNull(destiny);
-        this.visits = Objects.requireNonNull(visits);
-        this.routes = Objects.requireNonNull(routes);*/
+       
     }
 
-    public long getDistance() {
-        return distance;
-    }
+
     public _PortableLocation getOrigin() {
         return origin;
     }
@@ -121,7 +113,9 @@ class PortableRouting {
         return vehicles;
     }
 
-   
+    public long getPlannerId() {
+        return plannerId;
+    }
     
     public _PortableLocation getDestiny() {
         return destiny;
@@ -129,18 +123,14 @@ class PortableRouting {
     public List<_PortableLocation> getVisits() {
         return visits;
     }
-/*
-    public List<PortableRoute> getRoutes() {
-        return routes;
-    }
-    */
+
     @Override
     public String toString() {
         return "PlanningLocation{" +
                 "origin=" + origin.getLatitude() +
                 "destiny=" + destiny.getLatitude() +
                 
-                ",distance=" + distance +
+                
                 
                 '}';
     }

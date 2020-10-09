@@ -65,7 +65,7 @@ class RouteOptimizerImpl implements RouteOptimizer {
                 domainLocation,
                 new DistanceMapImpl(distanceMatrixRow)
         );
-        // Unfortunately can't start solver with an empty solution (see https://issues.redhat.com/browse/PLANNER-776)
+        
         if ((origin == null)) {
             logger.info("origin = new PlanningDepot(location);...");
             origin = new PlanningDepot(location);
@@ -77,7 +77,6 @@ class RouteOptimizerImpl implements RouteOptimizer {
                 publishSolution();
             }else{
                 logger.info("Planning Visit starting solver...");
-                
                 PlanningVisit visit = PlanningVisitFactory.fromLocation(location,domainLocation.demand());
                 visits.add(visit);
                 if (vehicles.isEmpty()) {

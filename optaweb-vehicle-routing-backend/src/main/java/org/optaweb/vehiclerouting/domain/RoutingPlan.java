@@ -29,9 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import static java.util.Collections.emptyList;
 
-/**
- * Route plan for the whole vehicle fleet.
- */
 public class RoutingPlan {
 
     private static final Logger logger = LoggerFactory.getLogger(RoutingPlan.class);

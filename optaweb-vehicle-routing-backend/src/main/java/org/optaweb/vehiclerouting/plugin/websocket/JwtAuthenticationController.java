@@ -5,6 +5,7 @@ import org.optaweb.vehiclerouting.plugin.persistence.config.JwtTokenUtil;
 import org.optaweb.vehiclerouting.plugin.persistence.planner.JwtPlannerDetailsService;
 import org.optaweb.vehiclerouting.plugin.persistence.planner.JwtRequest;
 import org.optaweb.vehiclerouting.plugin.persistence.planner.JwtResponse;
+import org.optaweb.vehiclerouting.plugin.persistence.planner.PlannerCrudRepository;
 import org.optaweb.vehiclerouting.plugin.persistence.planner.PlannerEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,16 +35,19 @@ public class JwtAuthenticationController {
 	@Autowired
 	private JwtPlannerDetailsService userDetailsService;
 
+	@Autowired
+	private PlannerCrudRepository plannerEntity;
+	
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
 		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-
+		PlannerEntity planner =  plannerEntity.findByUsername(authenticationRequest.getUsername());
 		final String token = jwtTokenUtil.generateToken(userDetails);
 
-		return ResponseEntity.ok(new JwtResponse(token));
+		return ResponseEntity.ok(new JwtResponse(token,planner.getId(),planner.getUsername()));
 	}
 
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
