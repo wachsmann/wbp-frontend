@@ -31,6 +31,7 @@ import { socketFactory } from '../utils/socketFactory';
 import WaypointServiceModel from '../model/WaypointServiceModel'
 import DepotServiceModel from '../model/DepotServiceModel';
 import { VehicleServiceModel } from '../model/VehicleServiceModel';
+import { getUser } from '../../../shared/helpers';
 var sock;
 const RoutingMap = (props) => {
   const { editMode, history } = props
@@ -61,9 +62,9 @@ const RoutingMap = (props) => {
     ){
      
       sock.send('/app/clear');
-     
+      let user = getUser()
       //dispatch(serviceRouting.solve({origin,destiny,vehicles,visits}))
-      sock.send('/app/planning', JSON.stringify({origin,destiny,vehicles,visits}));
+      sock.send('/app/planning', JSON.stringify({plannerId:user.id,origin,destiny,vehicles,visits}));
         
           sock.subscribe('/topic/route', (message) => {
             
@@ -71,7 +72,7 @@ const RoutingMap = (props) => {
               removeRoute(route)
             })
             const plan = JSON.parse(message.body);
-            
+            console.log(plan)
             setRoutePlan(plan)
             //dispatch(serviceRouting.solution(plan))
             setDistance(plan.distance)

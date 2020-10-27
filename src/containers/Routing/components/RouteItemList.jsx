@@ -46,13 +46,17 @@ export default function RouteItemList({route,removeRoute,handleItemClick}) {
             secondary={
                 <React.Fragment>
                 <Typography variant="caption" display="block" gutterBottom>
-                    Veículo: {vehicle.name}
+                    {`${vehicle.name} (Capacidade ${vehicle.capacity})`}
                 </Typography>
                
                 <Typography variant="caption" display="block" gutterBottom>
                 Pontos atendidos: {visits.length}
                 </Typography>
-                
+                <Typography variant="caption" display="block" gutterBottom>
+                Qtd de passageiros atendidos: {
+                  visits.reduce((accumulator, currentValue) => accumulator + currentValue.demand, 0)
+                }
+                </Typography>
                 </React.Fragment>
             }
             />

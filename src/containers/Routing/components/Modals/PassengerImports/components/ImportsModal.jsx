@@ -11,16 +11,17 @@ import { AppBar, IconButton, Typography, Toolbar, makeStyles } from '@material-u
 import Passenger from '../../../../model/Passenger'
 import axios from 'axios';
 import google from '../../../../../../config/google'
-import {mongoObjectId,getMapsPlacesComponents,sleep,getRandomColor} from '../../../../utils/utils'
+
 import PassengerAddress from '../../PassengerAddress';
 import CloseIcon from 'mdi-react/CloseIcon';
 import mapCirclePassengerArea from '../../../../utils/mapCirclePassengerArea';
+import { getMapsPlacesComponents, sleep } from '../../../../utils/utils';
 
 export default function ImportsModal(
   { routes,createPassenger,addPassenger,addPassengerMarkerListener,deletePassenger,passengers,passengerUpdate,generalRadius,handleClose, open }) {
   
   function getAddresses(query, passenger) {
-  
+  debugger
     // Call the geocode method with the geocoding parameters, the callback and an error callback function (called if a communication error occurs):
     var search_string = importType === "location" ? `latlng=${query.lat()},${query.lng()}` : `${importType}=${query}`
     var url = `https://maps.googleapis.com/maps/api/geocode/json?${search_string}&language=pt-BR&key=AIzaSyDNWfLrFUktmNHEskagJQX-_PsUokgkJ_M`;
@@ -37,14 +38,14 @@ export default function ImportsModal(
           solve({result:res.data.results[0],passenger})
         }
         
-      }).catch((err)=>{alert(err)})
+      }).catch((err)=>{console.log(err)/*alert(err)*/})
       )
     
   }
   async function handleImportPromises(promises) {
 
     Promise.all(promises).then((items) => {
-
+debugger
       console.log(items)
       items.forEach((item, key) => {
         var passenger = item.passenger
@@ -93,7 +94,7 @@ export default function ImportsModal(
         data.map((el, index) => {
 
           const { matricula, nome, rua, bairro, cidade, cep } = el.data
-          
+          debugger
           
           var passenger = createPassenger({ radius:parseInt(generalRadius),routes,positon: null, identifier: matricula, name: nome, street: rua, neighborhood: bairro, city: cidade, cep })
           addPassenger(passenger)

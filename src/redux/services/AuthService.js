@@ -26,6 +26,7 @@ export default class AuthService extends BaseService {
                 }
             ))
             setToken(res.data.token)
+            setUser(res.data)
             history.push("/app")
         }).catch((error)=>{
             
