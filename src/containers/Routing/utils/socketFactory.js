@@ -3,7 +3,7 @@ import { Client, Frame, over } from 'webstomp-client';
 const headerClient = {"Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aHdhY2hzbWFubkB3YnAuY29tIiwiZXhwIjoxNjAwMzIzNjQwLCJpYXQiOjE2MDAzMDU2NDB9.eobDG4FmtiIv4FgN3jlsHKktGbx9muUlu5_leRC_M0VqGLjVZfi6C4MZXH8gkkUa_scIvW5och5eOqMCfbNjnA"}
 
 export function socketFactory(successCallback,errorCallback) {
-    const webSocket = new SockJS('http://localhost:8080/vrp-websocket') 
+    const webSocket = new SockJS('https://wbp-bck.herokuapp.com/vrp-websocket') 
 
     var stompClient = over(webSocket, {
         debug: true,
