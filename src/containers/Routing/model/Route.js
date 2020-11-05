@@ -4,7 +4,7 @@ import objectKeyRemover from "../utils/objectKeyRemover"
 import ParseLatLng from "../utils/ParseLatLng"
 
 export function Route({ name = null,vehicle,track,visits=[], color = getRandomColor(), id = null}) {
-    console.log(vehicle,visits)
+    
     var _id = id === null ? mongoObjectId() : id
     name = !!name ? name : "Rota " + _id.substr(_id.length - 4, _id.length - 1)
     /** maps track object */
@@ -20,7 +20,7 @@ export function Route({ name = null,vehicle,track,visits=[], color = getRandomCo
 
     
     var pathMVC = new window.google.maps.MVCArray()
-    var polyline = new window.google.maps.Polyline({
+    this.polyline = new window.google.maps.Polyline({
         map:window.map,
         strokeColor:color,
         strokeOpacity: 0.9,
@@ -29,7 +29,7 @@ export function Route({ name = null,vehicle,track,visits=[], color = getRandomCo
         //editable: true
 
     });
-    polyline.setPath(pathMVC)
+    this.polyline.setPath(pathMVC)
     for (var i = 0; i < this.track.length; i++) {
         for (var j = 0; j < this.track[i].length; j++) {
             //console.log({lat:this.track[i][j][0],lng:this.track[i][j][1]})
@@ -37,13 +37,16 @@ export function Route({ name = null,vehicle,track,visits=[], color = getRandomCo
             pathMVC.push(new window.google.maps.LatLng(this.track[i][j][0], this.track[i][j][1]))
         }
     }
+    this.track = window.google.maps.geometry.encoding.encodePath(this.polyline.getPath()).replace(/\\/g,"\\\\")
+
+
     this.getId = () => { return _id }
 
     this.terminate = () => {
 
        
         //Object.keys(this.visits).forEach(key => this.visits[key].terminate())
-        if (polyline != null) polyline.setMap(null)
+        if (this.polyline != null) this.polyline.setMap(null)
     }
   
     this.setRoutePolyline = (trackRoute) => { track = trackRoute }

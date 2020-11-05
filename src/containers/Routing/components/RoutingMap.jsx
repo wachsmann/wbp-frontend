@@ -32,6 +32,8 @@ import WaypointServiceModel from '../model/WaypointServiceModel'
 import DepotServiceModel from '../model/DepotServiceModel';
 import { VehicleServiceModel } from '../model/VehicleServiceModel';
 import { getUser } from '../../../shared/helpers';
+import { VehicleRoutesServiceModel } from '../model/VehicleRoutesServiceModel';
+import { VisitRoutesServiceModel } from '../model/VisitRoutesServiceModel';
 var sock;
 const RoutingMap = (props) => {
   const { editMode, history } = props
@@ -105,12 +107,13 @@ const RoutingMap = (props) => {
   }
   
   useEffect(() => {
+   
     function sucessCallback(res){
       console.log('open');
       
       
     }
-    function errorCallback(res){}
+    function errorCallback(res){alert("Erro ao conectar com solucionador")}
     sock = socketFactory(sucessCallback,errorCallback)
     console.log(sock)
    
@@ -226,9 +229,27 @@ const RoutingMap = (props) => {
       const vehicles = VehicleServiceModel(vehiclesRef.current) 
       const origin = DepotServiceModel(originMarkerRef.current)
       const destiny = DepotServiceModel(destinyMarkerRef.current)
-      const routes = routePlan.routes
-
-      sock.send('/app/planning/store', JSON.stringify({name:routingNameRef.current,radius:getCurrentRadius(),visits,vehicles,origin,destiny,routes}))
+      
+      
+      const routes = RouteServiceModel(routesRef.current)
+      const visitRoutes = VisitRoutesServiceModel(routesRef.current)
+      const vehicleRoutes = VehicleRoutesServiceModel(routesRef.current)
+      console.log(routes)
+      sock.send('/app/store', JSON.stringify(
+        {
+          name:routingNameRef.current,
+          distance:routePlan.distance,
+          origin,
+          radius:getCurrentRadius(),
+          destiny,
+          visits,
+          vehicles,
+          routes,
+          visitRoutes,
+          vehicleRoutes,
+          
+        }
+      ))
     }
     /*
     if (editMode) {

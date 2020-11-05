@@ -27,7 +27,7 @@ export default class AuthService extends BaseService {
             ))
             setToken(res.data.token)
             setUser(res.data)
-            history.push("/app")
+            history.push("/app/roteirizacao")
         }).catch((error)=>{
             
             dispatch(this.actions.authRequestFailure(

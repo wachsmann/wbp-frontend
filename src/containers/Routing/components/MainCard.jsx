@@ -12,6 +12,7 @@ import { withRouter } from 'react-router-dom';
 
 import ConfigurationModal from './Modals/Configuration/ConfigurationModal'
 import SaveInfo from './Modals/SaveInfo'
+import { logout } from '../../../shared/helpers';
 
 const MainCard = (props) => {
     const {t,routingTitle,routeProps,history,passengerProps,routeWay,setRouteWay,generalRadius,handleGeneralRadius,handleRoutingSave,customerProps} = props
@@ -33,7 +34,11 @@ const MainCard = (props) => {
            
             <CardHeader
         avatar={
-            <IconButton onClick={()=>window.confirm("Atenção! Você está saindo da roteirização, deseja continuar?") ? history.push("/app") : {}} size={"small"} >
+            <IconButton onClick={()=>{
+              if(window.confirm("Atenção! Você está saindo da roteirização, deseja continuar?")){
+                logout() 
+                history.push('/log_in')
+              }}} size={"small"} >
             <ExitToAppIcon />
           </IconButton>
         }
