@@ -36,8 +36,8 @@ const MainCard = (props) => {
         avatar={
             <IconButton onClick={()=>{
               if(window.confirm("Atenção! Você está saindo da roteirização, deseja continuar?")){
-                logout() 
-                history.push('/log_in')
+                
+                history.push('/app')
               }}} size={"small"} >
             <ExitToAppIcon />
           </IconButton>

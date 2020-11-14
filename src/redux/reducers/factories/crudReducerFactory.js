@@ -10,13 +10,7 @@ class crudReducerFactory {
             name: slice,
             initialState: {
                 isLoading:true,
-                list: {
-                    data: [],
-                    page: 0,
-                    totalCount: 0,
-                    rowsPerPage:10,
-                    searchTerm: null
-                },
+                list: [],
                 item: {}
             },
             reducers: this._generateReducers()
@@ -38,7 +32,7 @@ class crudReducerFactory {
             },
             requestGetItemsSuccess: (state, action) => {
                 state.isLoading = false;
-                state.list = action.payload.list;
+                state.list = action.payload;
             },
             requestGetItemsError: (state, action) => {
                 state.isLoading = false;

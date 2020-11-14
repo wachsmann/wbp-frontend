@@ -1,5 +1,5 @@
 
-import { serviceBoy } from '../../shared/helpers'
+import { getUser, serviceBoy } from '../../shared/helpers'
 
 import BaseService from './BaseService'
 
@@ -12,25 +12,10 @@ class RoutingService extends BaseService {
         
         dispatch(this.actions.requestGetItems({}));
    
-        const url = `/routing/${payload.page}/${payload.rowsPerPage}`
+        const url = `/routing/all/${getUser().id}`
         
         return service.get(url).then((res)=>{
-            const actionData = payload ? {
-                list: {
-                    page:res.data.pageable.pageNumber,
-                    data:res.data.content,
-                    totalCount:res.data.totalElements,
-                    rowsPerPage:res.data.pageable.pageSize,
-                }
-            } : {
-                list: {
-                    page: 0,
-                    data:res.data,
-                    totalCount: 0,
-                    rowsPerPage: 10,
-                }
-            }
-            dispatch(this.actions.requestGetItemsSuccess(actionData))
+            dispatch(this.actions.requestGetItemsSuccess(res.data))
         }).catch((error)=>{
             console.log(error)
             //notificationDispatcherBoy({color: notificationColorOptions.error,message:messageCodes.FETCH_FAILURE})
@@ -58,10 +43,21 @@ class RoutingService extends BaseService {
     solution = (payload)=>async dispatch=>{
         dispatch(this.actions.routeSolution(payload));
     }
-    store = (routing) => async dispatch => {
-     
-        dispatch(this.actions.requestStore(routing));
+    store = (data, history, service = serviceBoy) => async dispatch => {
+        dispatch(this.actions.requestStore(data));
+        return service.post("/routing", data)
+            .then(
+                res => {
+                    dispatch(this.actions.storeSuccess(res))
+                    
+                }
+            )
+            .catch((error) => {
+                dispatch(this.actions.storeFail({ error: { code: messageCodes.FETCH_FAILURE } }))
+               
+            })
     }
+
     storeSuccess = (history) => async dispatch => {
         dispatch(this.actions.requestStoreSuccess());
     }
@@ -85,7 +81,7 @@ class RoutingService extends BaseService {
     delete = (id, service = serviceBoy) => async dispatch => {
         dispatch(this.actions.requestDelete({}));
 
-        return service.delete("/routing/" + id)
+        return service.delete(`/routing/${id}`)
             .then(
                 res => { 
                     dispatch(this.actions.deleteSuccess({}))

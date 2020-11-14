@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Map from "./Map"
 
 import classNames from 'classnames'
-import { ORIGIN, DESTINY, STOP,ADDRESS,SOFT, LIGHT} from "../utils/constants"
-import {mongoObjectId,getMapsPlacesComponents,sleep,getRandomColor} from '../utils/utils'
+import { ORIGIN, DESTINY, STOP, ADDRESS, SOFT, LIGHT } from "../utils/constants"
+import { mongoObjectId, getMapsPlacesComponents, sleep, getRandomColor } from '../utils/utils'
 
 
 import { renderToString } from 'react-dom/server'
-import { RoutePolyline, Route, Waypoint,Vehicle, RouteServiceModel, PassengerServiceModel,Passenger } from '../../Routing/model'
+import { RoutePolyline, Route, Waypoint, Vehicle, RouteServiceModel, PassengerServiceModel, Passenger } from '../../Routing/model'
 import Origin from './Icons/Origin'
 import Destiny from './Icons/Destiny'
 
@@ -35,6 +35,7 @@ import { getUser } from '../../../shared/helpers';
 import { VehicleRoutesServiceModel } from '../model/VehicleRoutesServiceModel';
 import { VisitRoutesServiceModel } from '../model/VisitRoutesServiceModel';
 var sock;
+var tracks = []
 const RoutingMap = (props) => {
   const { editMode, history } = props
   const id = editMode ? props.match.params.id : null
@@ -43,7 +44,7 @@ const RoutingMap = (props) => {
 
 
   const serviceRouting = new RoutingService(routingAction)
- 
+
   const passengerControlRef = React.createRef();
   const vehicleControlRef = React.createRef();
   const solveControlRef = React.createRef();
@@ -51,49 +52,78 @@ const RoutingMap = (props) => {
   const mainSideBarRef = React.createRef();
   const topBarActionsRef = React.createRef();
 
-  const handleSolveAction = () => { 
-    const visits = WaypointServiceModel(waypointsRef.current) 
-    const vehicles = VehicleServiceModel(vehiclesRef.current) 
+  const handleSolveAction = () => {
+    const visits = WaypointServiceModel(waypointsRef.current)
+    const vehicles = VehicleServiceModel(vehiclesRef.current)
     const origin = DepotServiceModel(originMarkerRef.current)
     const destiny = DepotServiceModel(destinyMarkerRef.current)
-    if(
-      visits.length > 0 && 
+    if (
+      visits.length > 0 &&
       vehicles.length > 0 &&
       !!origin &&
       !!destiny
-    ){
-     
+    ) {
+
       sock.send('/app/clear');
       let user = getUser()
       //dispatch(serviceRouting.solve({origin,destiny,vehicles,visits}))
-      sock.send('/app/planning', JSON.stringify({plannerId:user.id,origin,destiny,vehicles,visits}));
+      sock.send('/app/planning', JSON.stringify({ plannerId: user.id, origin, destiny, vehicles, visits }));
+
+      sock.subscribe('/topic/route', (message) => {
+        /*
+        Object.keys(routesRef.current).map((route)=>{
+          removeRoute(route)
+        })
+        */
+        const plan = JSON.parse(message.body);
+        //console.log(plan)
+       
+        //dispatch(serviceRouting.solution(plan))
+        setDistance(plan.distance)
         
-          sock.subscribe('/topic/route', (message) => {
-            
-            Object.keys(routesRef.current).map((route)=>{
-              removeRoute(route)
-            })
-            const plan = JSON.parse(message.body);
-            console.log(plan)
-            setRoutePlan(plan)
-            //dispatch(serviceRouting.solution(plan))
-            setDistance(plan.distance)
-            if(plan.routes){
-              plan.routes.forEach((route)=>{
-                let newRoute = new Route(route)
-                //console.log(newRoute)
-                setRoutes({ ...routesRef.current, ...{ [newRoute.getId()]: newRoute } })
-              })
-            }
-            
-          });
-    }else{
+        if(plan.routes){
+          
+          tracks.forEach(track=>{
+            if(!!track)
+              track.setMap(null)
+          })
+          plan.routes.forEach((route)=>{
+          var color = getRandomColor()
+          route.color = color
+          var track = route.track
+          var pathMVC = new window.google.maps.MVCArray()
+          var polyline = new window.google.maps.Polyline({map:window.map,strokeColor:color,strokeOpacity: 0.9,strokeWeight: 6});
+          polyline.setPath(pathMVC)
+          for (var i = 0; i < track.length; i++) {
+              for (var j = 0; j < track[i].length; j++) {
+                  pathMVC.push(new window.google.maps.LatLng(track[i][j][0],track[i][j][1]))
+              }
+          }
+          tracks.push(polyline)
+            //let newRoute = new Route(route)
+            ////console.log(newRoute)
+            //setRoutes({ ...routesRef.current, ...{ [newRoute.getId()]: newRoute } })
+          })
+          setRoutePlan(plan.routes)
+          
+        }
+
+
+      });
+    } else {
       alert("Configurações incompletas, por favor insira passageiros, veículos, origem e destino!")
     }
-   
+
   }
 
-  const [routePlan, setRoutePlan] = useState()
+  const [routePlan, _setRoutePlan] = useState()
+
+  const routePlanRef = React.useRef(routePlan)
+  const setRoutePlan = data => {
+
+    routePlanRef.current = data
+    _setRoutePlan(data)
+  }
   const [loading, setLoading] = useState(true)
   const handleLoading = (status) => setLoading(status)
 
@@ -105,49 +135,49 @@ const RoutingMap = (props) => {
     pinTypeRef.current = data
     _setPinType(data)
   }
-  
+
   useEffect(() => {
-   
-    function sucessCallback(res){
-      console.log('open');
-      
-      
+
+    function sucessCallback(res) {
+      //console.log('open');
+
+
     }
-    function errorCallback(res){alert("Erro ao conectar com solucionador")}
-    sock = socketFactory(sucessCallback,errorCallback)
-    console.log(sock)
-   
-    sock.onopen = function() {
-       
+    function errorCallback(res) { alert("Erro ao conectar com solucionador") }
+    sock = socketFactory(sucessCallback, errorCallback)
+    //console.log(sock)
+
+    sock.onopen = function () {
+
     };
-   
-    sock.onmessage = function(e) {
-        console.log('message', e.data);
-        sock.close();
+
+    sock.onmessage = function (e) {
+      //console.log('message', e.data);
+      sock.close();
     };
-  
-  
-    sock.onclose = function() {
-        console.log('close');
+
+
+    sock.onclose = function () {
+      //console.log('close');
     };
     if (editMode) {
-      
-      //dispatch(service.getItem('routing', id))
+
+      dispatch(serviceRouting.getItem(id))
       const routingUnsubscribe = store.subscribe(() => {
-        
+
         const { routing } = store.getState()
         if (!!routing.item) {
           if (!!!window.google) {
             alert("Google Maps não carregou corretamente, por favor cheque sua internet e tente novamente!")
           } else {
             routingUnsubscribe()
-            
+
             fetchRouting(routing.item)
           }
         }
       })
-     
-      return () => { 
+
+      return () => {
         routingUnsubscribe()
       }
     }
@@ -156,45 +186,45 @@ const RoutingMap = (props) => {
 
     if (!!routing && routing.id) {
       //Configurations 
-      
+
       setGeneralRadius(routing.radiusRange)
-      
-      
+
+
       var bounds = new window.google.maps.LatLngBounds();
       //Set fixed destiny and bounds
 
       //Routes
       if (!!routing.routes && routing.routes.length > 0) {
-        
+
         //One Destiny
         let position = !!routing.routes[0].destiny ? { lat: routing.routes[0].destiny.lat, lng: routing.routes[0].destiny.lng } : { lat: 0, lng: 0 }
         bounds.extend(position);
         setFixedMark(setMarkerIcon({ marker: newMarker({ position }), type: DESTINY }))
-/*
-        if (!!fixedMarker)
-          fixedMarker.addListener("dragend", calculateAndDisplayRoute)
-*/
+        /*
+                if (!!fixedMarker)
+                  fixedMarker.addListener("dragend", calculateAndDisplayRoute)
+        */
         //ready to mount routings
         routing.routes.map((route) => {
           var newRoute = null
-        
-              if (route.origin) {
-                let position = { lat: route.origin.coordinates[1], lng: route.origin.coordinates[0] }
-                bounds.extend(position)
 
-                let marker = setMarkerIcon({ color: route.color, marker: newMarker({ position }), type: ORIGIN })
-                //Route
-                //newRoute = new Route({ id: route.id, name: route.name, fixedMarker, marker, color: route.color })
+          if (route.origin) {
+            let position = { lat: route.origin.coordinates[1], lng: route.origin.coordinates[0] }
+            bounds.extend(position)
 
-                //setRoutes({ ...routesRef.current, ...{ [newRoute.getId()]: newRoute } })
+            let marker = setMarkerIcon({ color: route.color, marker: newMarker({ position }), type: ORIGIN })
+            //Route
+            //newRoute = new Route({ id: route.id, name: route.name, fixedMarker, marker, color: route.color })
+
+            //setRoutes({ ...routesRef.current, ...{ [newRoute.getId()]: newRoute } })
 
 
-              }
-           
+          }
+
 
           if (!!newRoute) {
-            
-           
+
+
           }
 
         })
@@ -220,53 +250,43 @@ const RoutingMap = (props) => {
 
 
   /** ROUTE */
-  
+
   const handleRoutingSave = (name) => {
-    
-    
-    if(routePlan){
-      const visits = WaypointServiceModel(waypointsRef.current) 
-      const vehicles = VehicleServiceModel(vehiclesRef.current) 
+
+
+    if (routePlan) {
       const origin = DepotServiceModel(originMarkerRef.current)
       const destiny = DepotServiceModel(destinyMarkerRef.current)
-      
-      
+      debugger
+      const passengers = PassengerServiceModel(passengersRef.current)
       const routes = RouteServiceModel(routesRef.current)
-      const visitRoutes = VisitRoutesServiceModel(routesRef.current)
-      const vehicleRoutes = VehicleRoutesServiceModel(routesRef.current)
-      console.log(routes)
-      sock.send('/app/store', JSON.stringify(
-        {
-          name:routingNameRef.current,
-          distance:routePlan.distance,
-          origin,
-          radius:getCurrentRadius(),
-          destiny,
-          visits,
-          vehicles,
-          routes,
-          visitRoutes,
-          vehicleRoutes,
-          
-        }
-      ))
+      const data = {
+        name: routingNameRef.current,
+        distance: distanceRef.current,
+        origin,
+        rangePoint: getCurrentRadius(),
+        planner:{id:getUser().id},
+        passengers,
+        destiny,
+        routes,
+      }
+     
+      if (editMode) {
+        //return dispatch(service.update('group', undefined, Object.assign({ id }, formData),history))
+        
+        return dispatch(serviceRouting.update(Object.assign({ id }, data), history))
+      } else {
+        return dispatch(serviceRouting.store(data))
+  
+      }
+      
     }
-    /*
-    if (editMode) {
-      //return dispatch(service.update('group', undefined, Object.assign({ id }, formData),history))
-      routing.id = id
-      return dispatch(serviceRouting.update(routing, history))
-    } else {
+    
+  
 
-      return dispatch(
-        serviceRouting.store(routing, history)
-      )
-
-    }
-*/
 
   }
-  
+
   const [routingName, _setRoutingName] = useState("")
   const routingNameRef = React.useRef(routingName)
   const setRoutingName = data => {
@@ -290,10 +310,10 @@ const RoutingMap = (props) => {
   }
 
 
- 
+
   /** UPDATES ON STATES */
   const routesUpdate = () => setRoutes({ ...routesRef.current })
-  
+
   /** Origin */
   const [originMarker, _setOriginMarker] = useState()
   const originMarkerRef = React.useRef(originMarker)
@@ -301,7 +321,7 @@ const RoutingMap = (props) => {
     originMarkerRef.current = data
     _setOriginMarker(data)
   }
-    
+
   /** Destiny */
   const [destinyMarker, _setDestinyMarker] = useState()
   const destinyMarkerRef = React.useRef(destinyMarker)
@@ -322,11 +342,11 @@ const RoutingMap = (props) => {
   }
   const passengerUpdate = () => {
     setPassengers({ ...passengersRef.current })
-    var wpts = initMap(parseInt(generalRadiusRef.current),Object.values(passengersRef.current))
-    wpts.forEach((wpt)=>{
+    var wpts = initMap(parseInt(generalRadiusRef.current), Object.values(passengersRef.current))
+    wpts.forEach((wpt) => {
       addWaypoints(wpt)
     })
-    console.log(waypointsRef.current)
+    //console.log(waypointsRef.current)
   }
   const deletePassenger = (id) => {
 
@@ -349,43 +369,43 @@ const RoutingMap = (props) => {
   }
   const [passengerModalOpen, setPassengerModalOpen] = useState(false)
   const [passengerSelected, setPassengerSelected] = useState(null)
-    /** PASSENGERS */
-    const [vehicles, _setVehicles] = useState({})
-    const vehiclesRef = React.useRef(vehicles)
-    const setVehicles = data => {
-      vehiclesRef.current = data
-      _setVehicles(data)
+  /** PASSENGERS */
+  const [vehicles, _setVehicles] = useState({})
+  const vehiclesRef = React.useRef(vehicles)
+  const setVehicles = data => {
+    vehiclesRef.current = data
+    _setVehicles(data)
+  }
+  const addVehicle = (vehicle) => {
+    setVehicles({ ...vehiclesRef.current, ...{ [vehicle._id]: vehicle } })
+    //console.log(vehiclesRef.current)
+  }
+
+  const deleteVehicle = (id) => {
+
+    if (vehiclesRef.current[id]) {
+      var vehicle = vehiclesRef.current[id]
+      return new Promise((solve, eject) => {
+        if (window.confirm("Atenção! Você está removendo um passageiro, deseja continuar?")) {
+
+          setVehicles(objectKeyRemover(vehiclesRef.current, id))
+          solve()
+        }
+      })
     }
-    const addVehicle = (vehicle) => {
-      setVehicles({ ...vehiclesRef.current, ...{ [vehicle._id]: vehicle } })
-      console.log(vehiclesRef.current)
-    }
-    
-    const deleteVehicle = (id) => {
-  
-      if (vehiclesRef.current[id]) {
-        var vehicle = vehiclesRef.current[id]
-        return new Promise((solve, eject) => {
-          if (window.confirm("Atenção! Você está removendo um passageiro, deseja continuar?")) {
-            
-            setVehicles(objectKeyRemover(vehiclesRef.current, id))
-            solve()
-          }
-        })
-      }
-    }
-    /** WAYPOINTS */
-    const [waypoints, _setWaypoints] = useState({})
-    const waypointsRef = React.useRef(waypoints)
-    const setWaypoints = data => {
-      waypointsRef.current = data
-      _setWaypoints(data)
-    }
-    const addWaypoints = (waypoint) => {
-      setWaypoints({ ...waypointsRef.current, ...{ [waypoint._id]: waypoint } })
-      
-    }
-    
+  }
+  /** WAYPOINTS */
+  const [waypoints, _setWaypoints] = useState({})
+  const waypointsRef = React.useRef(waypoints)
+  const setWaypoints = data => {
+    waypointsRef.current = data
+    _setWaypoints(data)
+  }
+  const addWaypoints = (waypoint) => {
+    setWaypoints({ ...waypointsRef.current, ...{ [waypoint._id]: waypoint } })
+
+  }
+
   /** NEW PASSENGER */
   const [newPassengerComponents, _setNewPassengerComponents] = useState(
     {
@@ -416,9 +436,9 @@ const RoutingMap = (props) => {
     generalRadiusRef.current = data
     _setGeneralRadius(data)
   }
-  const applyGeneralRadius = ()=>{
-    console.log("applyGeneralRadius")
-    
+  const applyGeneralRadius = () => {
+    //console.log("applyGeneralRadius")
+
     Object.keys(waypointsRef.current).map((key) => {
       waypointsRef.current[key].terminate()
     })
@@ -428,9 +448,9 @@ const RoutingMap = (props) => {
   const handleGeneralRadius = (radius) => {
     if (radius <= MAX_RADIUS && radius >= MIN_RADIUS) {
       setGeneralRadius(radius)
-   
-      
-      
+
+
+
     } else {
       alert("Fora do raio permitido!")
     }
@@ -455,21 +475,21 @@ const RoutingMap = (props) => {
   
   */
 
- function removeRoute(_id) {
-  var route = routesRef.current[_id]
-  
-    
-      
-
-      route.terminate();
-      setRoutes(objectKeyRemover(routesRef.current, _id))
-
-      
-      //remove address attached to waypoints
-    
+  function removeRoute(_id) {
+    var route = routesRef.current[_id]
 
 
-}
+
+
+    route.terminate();
+    setRoutes(objectKeyRemover(routesRef.current, _id))
+
+
+    //remove address attached to waypoints
+
+
+
+  }
   /*
   *    
   *   Adds a marker on map. 
@@ -493,7 +513,7 @@ const RoutingMap = (props) => {
       /**
        * run method to iterate all routes and make them run Proximity method like when calculateAndDisplayRoutes
        */
- 
+
     })
 
   }
@@ -520,32 +540,32 @@ const RoutingMap = (props) => {
     */
   }
   const setLeaveMarker = ({ marker, color, type }) => {
-    
-    if(!!originMarkerRef.current){
-       originMarkerRef.current.setPosition(marker.getPosition());
-       marker.setMap(null)
-    }else{
+
+    if (!!originMarkerRef.current) {
+      originMarkerRef.current.setPosition(marker.getPosition());
+      marker.setMap(null)
+    } else {
       setOriginMarker(setMarkerIcon({ marker, color, type }))
     }
-    
-   
+
+
   }
   const addMark = ({ marker, color = getRandomColor(), pin_type = pinTypeRef.current, load = null }) => {
-    
+
 
     return new Promise((resolve, reject) => {
       if (!!!marker) return null;
       switch (parseInt(pin_type)) {
         case ORIGIN:
-            resolve(
-                setLeaveMarker({ marker, color, type: ORIGIN }) 
-            )
+          resolve(
+            setLeaveMarker({ marker, color, type: ORIGIN })
+          )
           break
         case DESTINY:
           resolve(
-          
-              createFixedMarkByType({ type: DESTINY, marker })
-          
+
+            createFixedMarkByType({ type: DESTINY, marker })
+
           )
           break;
         default:
@@ -553,14 +573,14 @@ const RoutingMap = (props) => {
       }
     })
   }
-  const createVehicle = ({prefix,plate,capacity}) => new Vehicle({prefix,plate,capacity})
+  const createVehicle = ({ prefix, plate, capacity }) => new Vehicle({ prefix, plate, capacity })
   const createPassenger = ({ marker, radius, routes, position, identifier, name, street, neighborhood, city, cep }) => {
 
 
     let id = mongoObjectId()
     if (!marker)
       marker = newMarker({ position })
-      marker.zIndex = 2
+    marker.zIndex = 2
     /**
      * ADD LISTENER ON MARKER
      */
@@ -581,15 +601,15 @@ const RoutingMap = (props) => {
     if (typeof marker == "undefined") throw "marker is undefined!"
     //if (typeof fixedMarker != "undefined" && fixedMarker != null) fixedMarker.setMap(null)
     setDestinyMarker(marker)
-    
+
 
     //marker.addListener("dragend", calculateAndDisplayRoute);
   }
 
 
-  
 
-  
+
+
   /**
    * Marker display and route creation 
    */
@@ -599,7 +619,7 @@ const RoutingMap = (props) => {
       const icon = type === ORIGIN ? <Origin color={color} /> : <Destiny color={color} />
       marker.setIcon({
         url: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(renderToString(icon))}`,
-        anchor:  new window.google.maps.Point(18, 38) ,
+        anchor: new window.google.maps.Point(18, 38),
         scaledSize: new window.google.maps.Size(35, 35),
         zIndex: 3
       })
@@ -615,11 +635,11 @@ const RoutingMap = (props) => {
         loading={loading}
         handleRoutingSave={handleRoutingSave}
         /** REFS */
-        mapRef={{ passengerControlRef,vehicleControlRef,solveControlRef,configurationControlRef, mainSideBarRef, topBarActionsRef }}
+        mapRef={{ passengerControlRef, vehicleControlRef, solveControlRef, configurationControlRef, mainSideBarRef, topBarActionsRef }}
         distance={distanceRef.current}
         /** Routes */
         routeProps={
-          { routingName:routingNameRef.current,setRoutingName,routes: routesRef.current, removeRoute, routesUpdate,  }}
+          { routingName: routingNameRef.current, setRoutingName, routes: routesRef.current,routePlan:routePlanRef.current, removeRoute, routesUpdate, }}
 
 
         /** PASSENGERS */
@@ -628,7 +648,7 @@ const RoutingMap = (props) => {
         passengerSelected={passengerSelected}
         setPassengerModalOpen={setPassengerModalOpen}
 
-        vehicleProps={{vehicles:vehiclesRef.current,createVehicle, addVehicle, deleteVehicle}}
+        vehicleProps={{ vehicles: vehiclesRef.current, createVehicle, addVehicle, deleteVehicle }}
 
         waypoints={waypointsRef.current}
 
@@ -637,9 +657,9 @@ const RoutingMap = (props) => {
         handleGeneralRadius={handleGeneralRadius}
         applyGeneralRadius={applyGeneralRadius}
         generalRadius={generalRadius}
-        
+
         /** MISC */
-        pinTypeProps={{pinType:pinTypeRef.current,setPinType}}
+        pinTypeProps={{ pinType: pinTypeRef.current, setPinType }}
         handleSolveAction={handleSolveAction}
         onMapLoad={map => {
           //All ready, let's get some things going...
@@ -647,7 +667,7 @@ const RoutingMap = (props) => {
           map.controls[window.google.maps.ControlPosition.TOP_CENTER].push(topBarActionsRef.current);
           map.controls[window.google.maps.ControlPosition.TOP_CENTER].push(solveControlRef.current);
 
-          
+
 
           map.controls[window.google.maps.ControlPosition.RIGHT_CENTER].push(passengerControlRef.current);
           map.controls[window.google.maps.ControlPosition.RIGHT_CENTER].push(vehicleControlRef.current);
@@ -657,12 +677,12 @@ const RoutingMap = (props) => {
 
           if (map) {
             window.map = map
-            
-  
-          
+
+
+
             map.addListener('click', (e) => (clickerListener({ e, map })))
-            
-            
+
+
             map.setOptions({
               zoomControlOptions: {
                 position: window.google.maps.ControlPosition.RIGHT_CENTER

@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import DirectionsBus from '@material-ui/icons/DirectionsBus';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Divider from '@material-ui/core/Divider';
+import { mongoObjectId } from '../utils/utils';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -29,12 +30,12 @@ function ListItemLink(props) {
 export default function RouteItemList({route,removeRoute,handleItemClick}) {
  
   const classes = useStyles();
-  const routeId = route.getId()
-  const name = route.getName()
+  const _id = mongoObjectId()
+  const name = `Rota ${(_id).substr(_id.length - 4, _id.length - 1)}`
   const vehicle = route.vehicle
   const visits = route.visits
 
-  const color = route.getColor()
+  const color = route.color
   
   return (
 

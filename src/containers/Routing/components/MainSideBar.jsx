@@ -170,7 +170,7 @@ console.log(distance)
             </div>
          
             <Divider />
-            <RouteList routes={routeProps.routes} removeRoute={routeProps.removeRoute} handleItemClick={handleItemClick} />
+            <RouteList routes={routeProps.routePlan} removeRoute={routeProps.removeRoute} handleItemClick={handleItemClick} />
             {
               routeProps.routeSelected ?
                 <RouteSideBar route={routeProps.routeSelected} eventHandlers={{ handleOpen, onDragEnd, handleDelete, handleWaypointClick }} open={open} /> :

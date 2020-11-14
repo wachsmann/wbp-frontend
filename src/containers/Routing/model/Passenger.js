@@ -12,13 +12,13 @@ export function Passenger({ id, marker, getRoutes, radius, identifier, name, str
 
 
 
-    var _id = id ? id : mongoObjectId()
+    this.id = id ? id : mongoObjectId()
     var passenger_ballon_name = null;
     this.marker = marker
     this.centerPoint = null
     var attachedPolyline
-    this.identifier = identifier ? identifier : _id
-    this.name = name ? name : `P${_id}`
+    this.identifier = identifier ? identifier : id
+    this.name = name ? name : `P${id}`
     
 
     this.status = marker.getPosition() ? true : false
@@ -28,7 +28,7 @@ export function Passenger({ id, marker, getRoutes, radius, identifier, name, str
     this.cep = cep
     this.waypointId = null
     this.routeId = null
-    this.getId = () => _id
+    this.getId = () => id
     this.radius = radius
     this.waypointListener = {
         waypointListener:null,

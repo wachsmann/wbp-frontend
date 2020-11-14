@@ -244,8 +244,11 @@ let TableBase = props => {
 
                 options={{
                     //selection: true,
+                    
+                    paging: false,
+                      
                     actionsColumnIndex: -1,
-                    pageSize: rowsPerPage,
+                    
                     search: false,
                     
                     cellStyle: { padding: '0.5em 0.5em 0.5em 0.5em'},
@@ -266,14 +269,7 @@ let TableBase = props => {
                         "searchTooltip": "Procurar",
                       
                     },
-                    pagination: {
-                        labelRowsSelect: "linhas",
-                        labelDisplayedRows: "{from}-{to} de {count}",
-                        firstTooltip: "Primeira página",
-                        previousTooltip: "Página anterior",
-                        nextTooltip: "Próxima página",
-                        lastTooltip: "Última página"
-                    }
+                    
                     
                 }}
 

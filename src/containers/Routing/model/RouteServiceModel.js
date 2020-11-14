@@ -12,17 +12,16 @@ export function RouteServiceModel(routes) {
             var visits = []
             route.visits.map(waypoint => {
                 visits.push({
-                    id: `${waypoint.id}`,
                     demand: waypoint.demand,
                     latitude: waypoint.lat,
                     longitude: waypoint.lng,
+                    planner:{id:getUser().id},
+                    description:""
                 })
             })
             return ({
-                name: route.getName(),
-                //visits,
-                
-                //vehicle:route.vehicle.id,
+                visits,
+                vehicle:route.vehicle,
                 track: route.track,
             })
         }

@@ -33,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
 export default function RouteList({ routes,removeRoute,handleItemClick }) {
 
   const classes = useStyles(); 
+  console.log("ROUTE PLAN -> ",routes)
   return (
 
     <div className={classes.root}>
@@ -40,10 +41,10 @@ export default function RouteList({ routes,removeRoute,handleItemClick }) {
         <div className={classes.demo}>
           <List id="routing-card" dense={true}>
             {
-              routes && Object.keys(routes).map((key, index) => {
-                let route = routes[key]
+              !!routes && routes.map((route,index) => {
+                
                 return <RouteItemList
-                  key={key}
+                  key={index}
                   handleItemClick={handleItemClick}
                   route={route}
                   removeRoute={removeRoute}

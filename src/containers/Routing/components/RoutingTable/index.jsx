@@ -15,17 +15,16 @@ const RoutingPage = () => {
   
   const routingService = new RoutingService(routingActions)
   const handleDelete =  (event, rowData) => {
-    return dispatch(routingService.delete('routing',rowData.id))
+    console.log(rowData)
+    return dispatch(routingService.delete(rowData.id))
   }
   const handleList = (data) =>{
-    //dispatch(routingService.getList(data))
+    dispatch(routingService.getList())
   }
-  const {list,isLoading} = useSelector(state => state.routing)
-  const {page,rowsPerPage,totalCount,data} = {rowsPerPage:10,totalCount:4,data:[],page:1}//list
- // const editable = data.map(o => ({ ...o }))
- const editable = [
-    {id:1,name:"teste 1"},{id:2,name:"teste 2"},{id:3,name:"teste 3"},{id:4,name:"teste 4"}
-  ]
+  const {list} = useSelector(state => state.routing)
+  
+ const editable = !!list && list.map(o => ({ ...o }))
+
   return (
     <Container>
       <div style={{ width: "100%" }}>
@@ -45,10 +44,7 @@ const RoutingPage = () => {
           }
 
           stateName='routing'
-          page={page}
-          //isSearchable
-          totalCount={totalCount}
-          rowsPerPage={rowsPerPage}
+         
           data={editable}
           handleDelete={handleDelete}
           handleList={handleList}
