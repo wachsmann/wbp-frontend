@@ -12,13 +12,13 @@ export function Passenger({ id, marker, getRoutes, radius, identifier, name, str
 
 
 
-    this.id = id ? id : mongoObjectId()
+    this.id = id ? id : null
     var passenger_ballon_name = null;
     this.marker = marker
     this.centerPoint = null
     var attachedPolyline
-    this.identifier = identifier ? identifier : id
-    this.name = name ? name : `P${id}`
+    this.identifier = identifier ? identifier : mongoObjectId()
+    this.name = name ? name : `P${mongoObjectId()}`
     
 
     this.status = marker.getPosition() ? true : false

@@ -1,1 +1,1 @@
-export default ({draggable = true,position = {lat:0,lng:0},map=window.map}) => new window.google.maps.Marker({draggable,position,map})
+export default ({draggable = true,position = {lat:0,lng:0},map=window.map,data}) => new window.google.maps.Marker({draggable,position,map,data})

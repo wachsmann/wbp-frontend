@@ -18,7 +18,7 @@ import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import { NaturePeople } from '@material-ui/icons';
 export default React.forwardRef((props, ref) => {
   const { routeProps, passengerProps,vehicleProps,waypoints, generalRadius, passengerModalOpen, setPassengerModalOpen, passengerSelected,distance} = props
-console.log(distance)
+
   const [open, setOpen] = useState(false)
   const [infoModalOpen, setInfoModalOpen] = useState(false)
 

@@ -9,7 +9,7 @@ import objectKeyRemover from '../utils/objectKeyRemover'
 
 
 export function Vehicle({id, prefix,plate,capacity}) {
-    this._id = id ? id : mongoObjectId()
+    this.id = id ? id : null
     this.prefix = prefix
     this.plate = plate
     this.capacity = !!capacity ? capacity : 0

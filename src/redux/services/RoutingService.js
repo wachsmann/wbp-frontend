@@ -48,8 +48,8 @@ class RoutingService extends BaseService {
         return service.post("/routing", data)
             .then(
                 res => {
-                    dispatch(this.actions.storeSuccess(res))
-                    
+                    dispatch(this.actions.storeSuccess())
+                    history.push("/app")
                 }
             )
             .catch((error) => {
@@ -64,12 +64,11 @@ class RoutingService extends BaseService {
     update = (routing, history, service = serviceBoy) => async dispatch => {
      
         dispatch(this.actions.requestUpdate({ routing }));
-        return service.put("/routing",routing)
+        return service.put(`/routing/${routing.id}`,routing)
             .then(
                 res => {
                     dispatch(this.actions.storeSuccess({}))
-                    //notificationDispatcherBoy({color:"success",message:"service.dataSuccessfulMessage"})
-                    history.push('/app/roteirizacao/inicio');
+                    history.push('/app');
                 }
             )
             .catch((error) => {

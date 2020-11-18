@@ -34,6 +34,7 @@ import { VehicleServiceModel } from '../model/VehicleServiceModel';
 import { getUser } from '../../../shared/helpers';
 import { VehicleRoutesServiceModel } from '../model/VehicleRoutesServiceModel';
 import { VisitRoutesServiceModel } from '../model/VisitRoutesServiceModel';
+import { LensTwoTone } from '@material-ui/icons';
 var sock;
 var tracks = []
 const RoutingMap = (props) => {
@@ -57,6 +58,7 @@ const RoutingMap = (props) => {
     const vehicles = VehicleServiceModel(vehiclesRef.current)
     const origin = DepotServiceModel(originMarkerRef.current)
     const destiny = DepotServiceModel(destinyMarkerRef.current)
+    debugger
     if (
       visits.length > 0 &&
       vehicles.length > 0 &&
@@ -77,35 +79,36 @@ const RoutingMap = (props) => {
         */
         const plan = JSON.parse(message.body);
         //console.log(plan)
-       
+
         //dispatch(serviceRouting.solution(plan))
         setDistance(plan.distance)
-        
-        if(plan.routes){
-          
-          tracks.forEach(track=>{
-            if(!!track)
+
+        if (plan.routes) {
+
+          tracks.forEach(track => {
+            if (!!track)
               track.setMap(null)
           })
-          plan.routes.forEach((route)=>{
-          var color = getRandomColor()
-          route.color = color
-          var track = route.track
-          var pathMVC = new window.google.maps.MVCArray()
-          var polyline = new window.google.maps.Polyline({map:window.map,strokeColor:color,strokeOpacity: 0.9,strokeWeight: 6});
-          polyline.setPath(pathMVC)
-          for (var i = 0; i < track.length; i++) {
+          plan.routes.forEach((route, index) => {
+            var color = getRandomColor()
+            route.color = color
+            var track = route.track
+            var pathMVC = new window.google.maps.MVCArray()
+            var polyline = new window.google.maps.Polyline({ map: window.map, strokeColor: color, strokeOpacity: 0.9, strokeWeight: 6 });
+            polyline.setPath(pathMVC)
+            for (var i = 0; i < track.length; i++) {
               for (var j = 0; j < track[i].length; j++) {
-                  pathMVC.push(new window.google.maps.LatLng(track[i][j][0],track[i][j][1]))
+                pathMVC.push(new window.google.maps.LatLng(track[i][j][0], track[i][j][1]))
               }
-          }
-          tracks.push(polyline)
+            }
+            tracks.push(polyline)
+            plan.routes[index].polyline = polyline
             //let newRoute = new Route(route)
             ////console.log(newRoute)
             //setRoutes({ ...routesRef.current, ...{ [newRoute.getId()]: newRoute } })
           })
           setRoutePlan(plan.routes)
-          
+
         }
 
 
@@ -163,17 +166,23 @@ const RoutingMap = (props) => {
     if (editMode) {
 
       dispatch(serviceRouting.getItem(id))
-      const routingUnsubscribe = store.subscribe(() => {
+      const routingUnsubscribe = store.subscribe(async () => {
 
         const { routing } = store.getState()
-        if (!!routing.item) {
-          if (!!!window.google) {
-            alert("Google Maps não carregou corretamente, por favor cheque sua internet e tente novamente!")
-          } else {
-            routingUnsubscribe()
 
-            fetchRouting(routing.item)
+        if (!!routing.item) {
+          let strike = 0
+
+          //Sleep and try again
+          while (!(!!window.google) && strike < 100) {
+            //console.log("strking sleep")
+            await sleep(1000)
+            strike++
           }
+          if (!!window.google)
+            return fetchRouting(routing.item)
+          return alert("Google Maps não carregou corretamente, por favor cheque sua internet e tente novamente!")
+
         }
       })
 
@@ -182,62 +191,119 @@ const RoutingMap = (props) => {
       }
     }
   }, [])
+
+
+
   const fetchRouting = async (routing) => {
 
     if (!!routing && routing.id) {
       //Configurations 
-
-      setGeneralRadius(routing.radiusRange)
+      setRoutingName(routing.name)
+      setGeneralRadius(routing.rangePoint)
 
 
       var bounds = new window.google.maps.LatLngBounds();
       //Set fixed destiny and bounds
 
+      let destiny = !!routing.destiny ? 
+      {
+        id:routing.destiny.id,
+        position:{ lat: routing.destiny.latitude, lng: routing.destiny.longitude }
+      } : { lat: 0, lng: 0 }
+      
+      bounds.extend(destiny.position)
+      setFixedMark(setMarkerIcon({ marker: newMarker({ position: destiny.position,data:{id:destiny.id} }), type: DESTINY}))
+
+      let origin = !!routing.origin ? 
+      {
+        id:routing.origin.id,
+        position:{ lat: routing.origin.latitude, lng: routing.origin.longitude }} : { lat: 0, lng: 0 }
+      bounds.extend(origin.position)
+      
+      window.map.fitBounds(bounds)
+      window.map.panToBounds(bounds)
+      setOriginMarker(setMarkerIcon({ marker: newMarker({ position: origin.position,data:{id:origin.id} }), type: ORIGIN }))
       //Routes
+      var routes = []
       if (!!routing.routes && routing.routes.length > 0) {
 
         //One Destiny
-        let position = !!routing.routes[0].destiny ? { lat: routing.routes[0].destiny.lat, lng: routing.routes[0].destiny.lng } : { lat: 0, lng: 0 }
-        bounds.extend(position);
-        setFixedMark(setMarkerIcon({ marker: newMarker({ position }), type: DESTINY }))
+
         /*
                 if (!!fixedMarker)
                   fixedMarker.addListener("dragend", calculateAndDisplayRoute)
         */
         //ready to mount routings
         routing.routes.map((route) => {
-          var newRoute = null
 
-          if (route.origin) {
-            let position = { lat: route.origin.coordinates[1], lng: route.origin.coordinates[0] }
-            bounds.extend(position)
+          var color = getRandomColor()
+          var track = window.google.maps.geometry.encoding.decodePath(route.track)
+          var pathMVC = new window.google.maps.MVCArray()
+          var polyline = new window.google.maps.Polyline({ map: window.map, strokeColor: color, strokeOpacity: 0.9, strokeWeight: 6 });
+          polyline.setPath(pathMVC)
+          for (var i = 0; i < track.length; i++) {
 
-            let marker = setMarkerIcon({ color: route.color, marker: newMarker({ position }), type: ORIGIN })
-            //Route
-            //newRoute = new Route({ id: route.id, name: route.name, fixedMarker, marker, color: route.color })
-
-            //setRoutes({ ...routesRef.current, ...{ [newRoute.getId()]: newRoute } })
-
+            pathMVC.push(new window.google.maps.LatLng(track[i].lat(), track[i].lng()))
 
           }
+          tracks.push(polyline)
+          
+          addVehicle(createVehicle({ id:route.vehicle.id,prefix:'', plate:route.vehicle.name, capacity:route.vehicle.capacity }))
+          var visits = Array.from(new Set(route.visits.map(a => a.id)))
+          .map(id => {
+            return route.visits.find(a => a.id === id)
+          })
 
+          console.log(visits)
+          var newVisits = []
+          visits.forEach((visit) => {
+            const {id,latitude,longitude,demand,planner} = visit
+            let position = { lat: latitude, lng: longitude }
+            let marker = newMarker({ position })
+         
+            newVisits.push({ id,demand,planner,lat:latitude, lng: longitude})
+            
 
-          if (!!newRoute) {
+            let wp = new Waypoint(
+              {
+                id: visit.id,
+                map: window.map,
+                demand: visit.demand,
+                marker,
+                bounds: new window.google.maps.Circle(
+                  {
+                    strokeColor: LIGHT.GRAY,
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: LIGHT.GRAY,
+                    fillOpacity: 0.85,
+                    map: window.map,
+                    center: marker.getPosition(),
+                    radius: routing.rangePoint
+                  })
 
-
-          }
-
+              }
+            )
+            addWaypoints(wp)
+          })
+          routes.push({ id:route.id,color,polyline, track, visits: newVisits, vehicle: route.vehicle })
+          //let newRoute = new Route(route)
+          ////console.log(newRoute)
+          //setRoutes({ ...routesRef.current, ...{ [newRoute.getId()]: newRoute } })
         })
-        window.map.fitBounds(bounds)
-        window.map.panToBounds(bounds)
+
+
+        console.log(routes)
+        setRoutePlan(routes)
       }
       //Passengers
-      if (!!routing.clusterPoints) {
-        routing.clusterPoints.map((passenger) => {
+      if (!!routing.passengers) {
+        routing.passengers.map((passenger) => {
           if (!!passenger) {
-            const { name, street, neighborhood, city, cep } = passenger
-            let position = !!passenger.position ? { lat: passenger.position.coordinates[1], lng: passenger.position.coordinates[0] } : { lat: 0, lng: 0 }
-            addPassenger(createPassenger({ position, identifier: passenger.id, name, street, neighborhood, city, cep }))
+            const { name, street, neighborhood, city, cep, latitude, longitude,id } = passenger
+
+            let position = !!latitude && !!longitude ? { lat: latitude, lng: longitude } : { lat: 0, lng: 0 }
+            addPassenger(createPassenger({ id,position, identifier: name, name, street, neighborhood, city, cep }))
           }
 
         })
@@ -257,32 +323,32 @@ const RoutingMap = (props) => {
     if (routePlan) {
       const origin = DepotServiceModel(originMarkerRef.current)
       const destiny = DepotServiceModel(destinyMarkerRef.current)
-      debugger
+
       const passengers = PassengerServiceModel(passengersRef.current)
-      const routes = RouteServiceModel(routesRef.current)
+      const routes = RouteServiceModel(routePlanRef.current)
       const data = {
         name: routingNameRef.current,
         distance: distanceRef.current,
         origin,
         rangePoint: getCurrentRadius(),
-        planner:{id:getUser().id},
+        planner: { id: getUser().id },
         passengers,
         destiny,
         routes,
       }
-     
+
       if (editMode) {
-        //return dispatch(service.update('group', undefined, Object.assign({ id }, formData),history))
-        
+        console.log(data)
+
         return dispatch(serviceRouting.update(Object.assign({ id }, data), history))
       } else {
         return dispatch(serviceRouting.store(data))
-  
+
       }
-      
+
     }
-    
-  
+
+
 
 
   }
@@ -573,11 +639,11 @@ const RoutingMap = (props) => {
       }
     })
   }
-  const createVehicle = ({ prefix, plate, capacity }) => new Vehicle({ prefix, plate, capacity })
-  const createPassenger = ({ marker, radius, routes, position, identifier, name, street, neighborhood, city, cep }) => {
+  const createVehicle = ({ id,prefix, plate, capacity }) => new Vehicle({ id,prefix, plate, capacity })
+  const createPassenger = ({id, marker, radius, routes, position, identifier, name, street, neighborhood, city, cep }) => {
 
 
-    let id = mongoObjectId()
+   
     if (!marker)
       marker = newMarker({ position })
     marker.zIndex = 2
@@ -623,6 +689,7 @@ const RoutingMap = (props) => {
         scaledSize: new window.google.maps.Size(35, 35),
         zIndex: 3
       })
+      
     }
     return marker
   }
@@ -639,7 +706,7 @@ const RoutingMap = (props) => {
         distance={distanceRef.current}
         /** Routes */
         routeProps={
-          { routingName: routingNameRef.current, setRoutingName, routes: routesRef.current,routePlan:routePlanRef.current, removeRoute, routesUpdate, }}
+          { routingName: routingNameRef.current, setRoutingName, routes: routesRef.current, routePlan: routePlanRef.current, removeRoute, routesUpdate, }}
 
 
         /** PASSENGERS */

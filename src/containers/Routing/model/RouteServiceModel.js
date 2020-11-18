@@ -6,23 +6,26 @@ import ParseGeolocation from '../utils/ParseGeolocation'
 import { getUser } from '../../../shared/helpers'
 
 export function RouteServiceModel(routes) {
-    let user = getUser()
-    return Object.values(routes).map((route) =>
+    console.log(routes)
+    debugger
+    const planner = {id:getUser().id}
+    return routes.map((route) =>
         {
             var visits = []
             route.visits.map(waypoint => {
                 visits.push({
+                    id:waypoint.id,
                     demand: waypoint.demand,
                     latitude: waypoint.lat,
                     longitude: waypoint.lng,
-                    planner:{id:getUser().id},
+                    planner,
                     description:""
                 })
             })
             return ({
                 visits,
-                vehicle:route.vehicle,
-                track: route.track,
+                vehicle:{capacity:route.vehicle.capacity,name:route.vehicle.name,planner},
+                track: window.google.maps.geometry.encoding.encodePath(route.polyline.getPath())//.replace(/\\/g,"\\\\"),
             })
         }
     )

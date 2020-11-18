@@ -5,7 +5,7 @@ import { getUser } from "../../../shared/helpers";
 export function PassengerServiceModel(passengers) {
     return Object.values(passengers).map(passenger =>
         ({
-            //id: passenger.id,
+            id: passenger.id,
             cep: passenger.cep,
             city: passenger.city,
             name: passenger.name,

@@ -10,7 +10,7 @@ export default function WaypointServiceModel(waypoints) {
     return Object.values(waypoints).map(waypoint =>
         ({
             id: waypoint._id,
-            demand:parseInt(waypoint.passengers.length),
+            demand:!!waypoint.passengers ? parseInt(waypoint.passengers.length):0,
             latitude:ParseLatLng(waypoint.marker.getPosition()).lat,
             longitude:ParseLatLng(waypoint.marker.getPosition()).lng,
             description:"",
