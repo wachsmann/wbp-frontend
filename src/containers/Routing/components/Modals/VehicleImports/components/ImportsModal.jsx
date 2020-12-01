@@ -28,6 +28,7 @@ export default function ImportsModal(
           
                     
           var vehicle = createVehicle({ prefix:prefixo,plate:placa,capacity:capacidade})
+          debugger
           addVehicle(vehicle)
          
         })

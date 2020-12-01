@@ -9,7 +9,8 @@ import objectKeyRemover from '../utils/objectKeyRemover'
 
 
 export function Waypoint({ marker, color = "",passengers, bounds, label, visible = true, id = null, _name = null }) {
-    this._id = id ? id : null
+    this._id = id ? id : mongoObjectId()
+    this.getId = () => (this.id)
     this.marker = marker
     this.centerPoint = null
     this.circle = null

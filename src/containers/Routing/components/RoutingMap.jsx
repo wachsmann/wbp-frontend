@@ -403,7 +403,8 @@ const RoutingMap = (props) => {
     _setPassengers(data)
   }
   const addPassenger = (passenger) => {
-    setPassengers({ ...passengersRef.current, ...{ [passenger.getId()]: passenger } })
+    setPassengers({ ...passengersRef.current, ...{ [passenger.id]: passenger } })
+    console.log(passengersRef.current)
     window.google.maps.event.trigger(passenger.marker, 'dragend', { latLng: () => passenger.marker.getPosition() })
   }
   const passengerUpdate = () => {
@@ -443,7 +444,7 @@ const RoutingMap = (props) => {
     _setVehicles(data)
   }
   const addVehicle = (vehicle) => {
-    setVehicles({ ...vehiclesRef.current, ...{ [vehicle._id]: vehicle } })
+    setVehicles({ ...vehiclesRef.current, ...{ [vehicle.id]: vehicle } })
     //console.log(vehiclesRef.current)
   }
 

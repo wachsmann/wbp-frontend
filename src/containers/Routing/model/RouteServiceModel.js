@@ -6,8 +6,7 @@ import ParseGeolocation from '../utils/ParseGeolocation'
 import { getUser } from '../../../shared/helpers'
 
 export function RouteServiceModel(routes) {
-    console.log(routes)
-    debugger
+
     const planner = {id:getUser().id}
     return routes.map((route) =>
         {

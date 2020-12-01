@@ -12,7 +12,7 @@ export function Passenger({ id, marker, getRoutes, radius, identifier, name, str
 
 
 
-    this.id = id ? id : null
+    this.id = id ? id : mongoObjectId()
     var passenger_ballon_name = null;
     this.marker = marker
     this.centerPoint = null

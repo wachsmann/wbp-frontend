@@ -45,8 +45,8 @@ export default function ImportsModal(
   async function handleImportPromises(promises) {
 
     Promise.all(promises).then((items) => {
-debugger
-      console.log(items)
+
+  
       items.forEach((item, key) => {
         var passenger = item.passenger
         if (item.result != null) {
@@ -117,7 +117,7 @@ debugger
         data.map((el, index) => {
 
           const { nome, matricula, lat, lng } = el.data
-          
+          debugger
           let position = new window.google.maps.LatLng(lat, lng)
           var passenger = createPassenger({ radius:parseInt(generalRadius),routes,position, identifier: matricula, name: nome })
           addPassenger(passenger)
