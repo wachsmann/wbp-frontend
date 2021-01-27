@@ -449,14 +449,14 @@ const RoutingMap = (props) => {
   }
 
   const deleteVehicle = (id) => {
-
+debugger
     if (vehiclesRef.current[id]) {
       var vehicle = vehiclesRef.current[id]
       return new Promise((solve, eject) => {
-        if (window.confirm("Atenção! Você está removendo um passageiro, deseja continuar?")) {
+        if (window.confirm("Atenção! Você está removendo um veículo, deseja continuar?")) {
 
           setVehicles(objectKeyRemover(vehiclesRef.current, id))
-          solve()
+          setVehicles({ ...vehiclesRef.current })
         }
       })
     }

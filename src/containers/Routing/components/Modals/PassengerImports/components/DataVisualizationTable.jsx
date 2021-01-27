@@ -64,7 +64,7 @@ export default function DataVisualizationTable(props) {
                       }
                     </TableCell>
                     <TableCell align="left">
-                      <IconButton onClick={()=>handleDelete(row.getId())} aria-label="Excluir"><DeleteIcon /></IconButton></TableCell>
+                      <IconButton onClick={()=>handleDelete(key)} aria-label="Excluir"><DeleteIcon /></IconButton></TableCell>
                   </TableRow>
                 )
             })}

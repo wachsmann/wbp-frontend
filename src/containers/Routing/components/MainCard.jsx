@@ -36,7 +36,7 @@ const MainCard = (props) => {
         avatar={
             <IconButton onClick={()=>{
               if(window.confirm("Atenção! Você está saindo da roteirização, deseja continuar?")){
-                
+                logout()
                 history.push('/app')
               }}} size={"small"} >
             <ExitToAppIcon />
@@ -44,10 +44,7 @@ const MainCard = (props) => {
         }
         action={
             <CardActions disableSpacing>
-            <IconButton  size={"small"} onClick={handleSaveInfoOpen}  aria-label="add to favorites">
-              <SaveIcon />
-            </IconButton>
-          
+            
           
           <ConfigurationModal t={t} customerProps={customerProps} open={openConfiguration} generalRadius={generalRadius} routeWay={routeWay} setRouteWay={setRouteWay} handleGeneralRadius={handleGeneralRadius}  handleClose={handleConfigurationOpen}/>
           <SaveInfo routingName={routeProps.routingName} setRoutingName={routeProps.setRoutingName} open={openSaveInfo} handleRoutingSave={handleRoutingSave} handleClose={handleSaveInfoOpen}/>

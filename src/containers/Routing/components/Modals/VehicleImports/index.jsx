@@ -17,7 +17,7 @@ export default React.forwardRef((props, ref) => {
           vehicles={vehicles} 
           createVehicle={createVehicle}
           addVehicle={addVehicle} 
-          deletePassenger={deleteVehicle} 
+          deleteVehicle={deleteVehicle} 
           
           
           

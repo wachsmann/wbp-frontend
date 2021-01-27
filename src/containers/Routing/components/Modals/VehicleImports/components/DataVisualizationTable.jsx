@@ -43,6 +43,7 @@ export default function DataVisualizationTable(props) {
         <TableBody>
           {
             vehicles && Object.keys(vehicles).map((key, index) => {
+              debugger
               let row = vehicles[key]
                 return (
                   <TableRow key={row._id}>
@@ -50,7 +51,7 @@ export default function DataVisualizationTable(props) {
                     <TableCell align="left">{row.plate}</TableCell>
                     <TableCell align="left">{row.capacity}</TableCell>
                     <TableCell align="left">
-                      <IconButton onClick={()=>handleDelete(row._id)} aria-label="Excluir"><DeleteIcon /></IconButton></TableCell>
+                      <IconButton onClick={()=>handleDelete(key)} aria-label="Excluir"><DeleteIcon /></IconButton></TableCell>
                   </TableRow>
                 )
             })}

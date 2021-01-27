@@ -1,10 +1,11 @@
 import * as SockJS from 'sockjs-client';
 import { Client, Frame, over } from 'webstomp-client';
 import { getToken } from '../../../shared/helpers';
+import urlAppender from '../../../shared/helpers/urlAppender';
 
 
 export function socketFactory(successCallback,errorCallback) {
-    const webSocket = new SockJS('http://localhost:8080/vrp-websocket') 
+    const webSocket = new SockJS(urlAppender('/vrp-websocket')) 
     
     var stompClient = over(webSocket, {
         debug: true,

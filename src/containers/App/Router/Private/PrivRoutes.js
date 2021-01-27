@@ -20,7 +20,7 @@ export default ({ match }) => (
           
           <Route exact
               path={`${match.path}`}
-              component={RoutingPage}
+              component={AddRouting}
           />
         </Switch>
     </div>

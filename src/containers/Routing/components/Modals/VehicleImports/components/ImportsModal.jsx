@@ -17,18 +17,14 @@ import CloseIcon from 'mdi-react/CloseIcon';
 import mapCirclePassengerArea from '../../../../utils/mapCirclePassengerArea';
 
 export default function ImportsModal(
-  { vehicles,createVehicle,addVehicle,deletePassenger,generalRadius,handleClose, open }) {
+  { vehicles,createVehicle,addVehicle,deleteVehicle,generalRadius,handleClose, open }) {
   
   const handleOnDrop = async (data,generalRadius) => {
     var promises = []
   
         data.map((el, index) => {
-
           const { prefixo,placa,capacidade} = el.data
-          
-                    
           var vehicle = createVehicle({ prefix:prefixo,plate:placa,capacity:capacidade})
-          debugger
           addVehicle(vehicle)
          
         })
@@ -38,7 +34,7 @@ export default function ImportsModal(
 
   const handleDelete = (id) => {
 
-    deletePassenger(id)
+    deleteVehicle(id)
 
     return
   }
